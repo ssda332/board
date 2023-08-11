@@ -82,6 +82,7 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/api/hello").permitAll()
                 .antMatchers("/token/new").permitAll()
+                .antMatchers("/token").permitAll()
                 .antMatchers("/api/signup").permitAll()
 
                 .anyRequest().authenticated()
