@@ -1,5 +1,6 @@
 package yj.board.service;
 
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -53,7 +54,9 @@ public class WebSecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/xe/**", "/favicon.ico", "/error");
+        return (web) -> web.ignoring().antMatchers("/xe/**", "/favicon.ico", "/error",
+                        "/vendor/**", "/css/**", "/img/**", "/js/**", "/scss/**")
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
     @Bean
