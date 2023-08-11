@@ -43,7 +43,7 @@
                                     </div>
 
 
-                                    <form class="user">
+<!--                                    <form class="user">-->
                                         <div class="form-group">
                                             <!-- login id -->
                                             <input type="text" class="form-control form-control-user"
@@ -69,8 +69,50 @@
                                         <a href="../index.html" class="btn btn-facebook btn-user btn-block">
                                             <i class="fab fa-facebook-f fa-fw"></i> Facebook 로그인
                                         </a>
-                                    </form>
+<!--                                    </form>-->
 
+                                    <!--/* jquery script */-->
+                                    <script th:inline="javascript">
+                                        var loginForm = {
+                                            init: function() {
+                                                loginForm.bind();
+                                            },
+                                            bind: function() {
+                                                $("#btnLogin").on('click', function(){
+                                                    loginForm.signin();
+                                                });
+                                            },
+                                            signin: function() {
+                                                $.ajax({
+                                                    url: '/token',
+                                                    type: 'POST',
+                                                    dataType: 'json',
+                                                    contentType: 'application/json; charset=utf-8',
+                                                    data: JSON.stringify({
+                                                        loginId: $("#username").val(),
+                                                        password: $("#password").val()
+                                                    }),
+                                                    success: function(res){
+
+                                                        if(res != undefined){
+                                                            alert("로그인 되었습니다.");
+                                                            localStorage.setItem('token', res.token);
+
+                                                            window.location.replace("http://localhost:9091");
+
+                                                        } else {
+                                                            alert("실패");
+                                                        }
+                                                        console.log(res);
+                                                    }
+                                                });
+                                            }
+                                        }
+
+                                        $(function(){
+                                            loginForm.init();
+                                        });
+                                    </script>
 
                                     <!--<hr>-->
                                     <!--<div class="text-center">
