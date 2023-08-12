@@ -87,6 +87,7 @@ public class WebSecurityConfig {
                 .antMatchers("/token/new").permitAll()
                 .antMatchers("/token").permitAll()
                 .antMatchers("/api/signup").permitAll()
+//                .antMatchers("/").permitAll()
 
                 .anyRequest().authenticated()
 

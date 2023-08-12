@@ -49,7 +49,7 @@ public class TokenController {
 //        log.debug("jwt : {}", jwt);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-
+        httpHeaders.add("Location", "/"); // 대상 페이지 URL
         /*memberService.login(loginDto);
 
         토큰을 쿠키로 발급 및 응답에 추가
