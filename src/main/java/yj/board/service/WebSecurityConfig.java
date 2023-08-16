@@ -17,23 +17,23 @@ import yj.board.jwt.JwtAuthenticationEntryPoint;
 import yj.board.jwt.JwtSecurityConfig;
 import yj.board.jwt.TokenProvider;
 
-@EnableWebSecurity // 기본적인 웹 보안 활성화 어노테이션
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+//@EnableWebSecurity // 기본적인 웹 보안 활성화 어노테이션
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
     private final TokenProvider tokenProvider;
-//    private final CorsFilter corsFilter;
+    private final CorsFilter corsFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     public WebSecurityConfig(
             TokenProvider tokenProvider,
-//            CorsFilter corsFilter,
+            CorsFilter corsFilter,
             JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
             JwtAccessDeniedHandler jwtAccessDeniedHandler
     ) {
         this.tokenProvider = tokenProvider;
-//        this.corsFilter = corsFilter;
+        this.corsFilter = corsFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
     }
@@ -65,19 +65,19 @@ public class WebSecurityConfig {
                 // token을 사용하는 방식이기 때문에 csrf를 disable합니다.
                 .csrf().disable()
 
-//                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
-
                 .and()
                 .headers()
                 .frameOptions()
                 .sameOrigin()
+                .and()
+
 
                 // 세션을 사용하지 않기 때문에 STATELESS로 설정
-                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
@@ -90,7 +90,6 @@ public class WebSecurityConfig {
 //                .antMatchers("/").permitAll()
 
                 .anyRequest().authenticated()
-
                 .and()
                 .apply(new JwtSecurityConfig(tokenProvider));
 

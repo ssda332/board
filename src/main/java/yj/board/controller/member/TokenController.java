@@ -35,9 +35,9 @@ public class TokenController {
         return "members/login";
     }
 
-    @ResponseBody
+    /*@ResponseBody
     @PostMapping("")
-    public ResponseEntity<TokenDto> login(@Valid @RequestBody LoginDto loginDto) {
+    public ResponseEntity<TokenDto> login(@Valid LoginDto loginDto) {
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getLoginId(), loginDto.getPassword());
@@ -49,9 +49,9 @@ public class TokenController {
 //        log.debug("jwt : {}", jwt);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-        httpHeaders.add("Location", "/"); // 대상 페이지 URL
-        /*memberService.login(loginDto);
-
+//        httpHeaders.add("Location", "/"); // 대상 페이지 URL
+//        memberService.login(loginDto);
+*//*
         토큰을 쿠키로 발급 및 응답에 추가
         Cookie cookie = new Cookie(JwtFilter.AUTHORIZATION_HEADER, jwt);
         cookie.setMaxAge(7 * 24 * 60 * 60); // 7일 동안 유효
@@ -60,12 +60,11 @@ public class TokenController {
         cookie.setSecure(false);
 
         response.addCookie(cookie);
-        ResponseEntity res = new ResponseEntity();*/
+        ResponseEntity res = new ResponseEntity();*//*
 
         return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
-    }
-
-    /*@PostMapping("")
+    }*/
+    @PostMapping("")
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
 
         log.debug("/authenticate start");
@@ -85,5 +84,5 @@ public class TokenController {
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
 
         return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
-    }*/
+    }
 }

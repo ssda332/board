@@ -23,12 +23,12 @@ public class MemberController {
     @Autowired
     private final MemberService memberService;
 
-    @GetMapping("add")
+    @GetMapping("new")
     public String signUp(@ModelAttribute("member") Member member) {
         return "members/register";
     }
 
-    @PostMapping("add")
+    @PostMapping("")
     public String save(@Validated @ModelAttribute Member member, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
