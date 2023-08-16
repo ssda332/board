@@ -44,7 +44,7 @@
                                     </div>
 
 
-<!--                                    <form class="user">-->
+<!--                                    <form class="user" action="/token/new" method="POST">-->
                                         <div class="form-group">
                                             <!-- login id -->
                                             <input type="text" class="form-control form-control-user"
@@ -65,10 +65,10 @@
                                         <button type="submit" class="btn btn-primary btn-user btn-block"
                                         id="btnLogin">로그인</button>
                                         <hr>
-                                        <a href="../index.html" class="btn btn-google btn-user btn-block">
+                                        <a href="../fragments/layout.html" class="btn btn-google btn-user btn-block">
                                             <i class="fab fa-google fa-fw"></i> Google 로그인
                                         </a>
-                                        <a href="../index.html" class="btn btn-facebook btn-user btn-block">
+                                        <a href="../fragments/layout.html" class="btn btn-facebook btn-user btn-block">
                                             <i class="fab fa-facebook-f fa-fw"></i> Facebook 로그인
                                         </a>
 <!--                                    </form>-->
@@ -85,18 +85,18 @@
                                                 });
                                             },
                                             signin: function() {
+                                                const formData = new FormData();
+                                                formData.append("username", document.getElementById("username").value);
+                                                formData.append("password", document.getElementById("password").value);
                                                 $.ajax({
-                                                    url: '/token',
+                                                    url: '/login',
                                                     type: 'POST',
-                                                    dataType: 'json',
-                                                    contentType: 'application/json; charset=utf-8',
-                                                    data: JSON.stringify({
-                                                        loginId: $("#username").val(),
-                                                        password: $("#password").val()
-                                                    }),
+                                                    processData : false,
+                                                    contentType : false,
+                                                    data: formData,
                                                     success: function(res){
                                                         //window.location.href = xhr.getResponseHeader('Location');
-                                                        location.href = "/";
+                                                        // location.href = "/";
                                                         // if(res != undefined){
                                                         //     alert("로그인 되었습니다.");
                                                         //     // localStorage.setItem('token', res.token);
@@ -109,6 +109,14 @@
                                                         // }
                                                         // console.log(res);
                                                     }
+                                                }).done(function(data,status,xhr){
+                                                    /*let jwtToken = xhr.getResponseHeader('Authorization');
+                                                    localStorage.setItem("Authorization", jwtToken);*/
+                                                    location.href = "/";
+
+                                                }).fail(function (error) {
+                                                    console.log(error);
+                                                    alert("존재하지 않는 회원입니다.");
                                                 });
                                             }
                                         }
