@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import yj.board.controller.argumentresolver.Login;
 import yj.board.domain.member.Member;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @Slf4j
 @Controller
 public class HomeController {
@@ -15,6 +18,5 @@ public class HomeController {
         log.debug("url = /, homeLoginModel");
         return "index";
     }
-
 
 }

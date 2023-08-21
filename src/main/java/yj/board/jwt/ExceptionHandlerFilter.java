@@ -1,6 +1,7 @@
 package yj.board.jwt;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
@@ -22,6 +24,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (JWTVerificationException ex) {
+            log.debug("JWTVerificationException");
             setErrorResponse(HttpStatus.FORBIDDEN, request, response, ex);
         } catch (AuthenticationException ex) {
             setErrorResponse(HttpStatus.UNAUTHORIZED, request, response, ex);
@@ -32,9 +35,11 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
                                  HttpServletResponse response, Throwable ex) throws IOException {
 
         if (status == HttpStatus.FORBIDDEN) {
+            log.debug("403 forbidden");
             response.setStatus(status.value());
             response.sendRedirect("/");
         } else if (status == HttpStatus.UNAUTHORIZED) {
+            log.debug("401 unauthorized");
             response.setStatus(status.value());
             response.sendRedirect("token/new");
         }

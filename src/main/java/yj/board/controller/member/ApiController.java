@@ -13,10 +13,10 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")
-public class MemberControllerV2 {
+public class ApiController {
     private final MemberServiceV2 memberService;
 
-    public MemberControllerV2(MemberServiceV2 memberService) {
+    public ApiController(MemberServiceV2 memberService) {
         this.memberService = memberService;
     }
 

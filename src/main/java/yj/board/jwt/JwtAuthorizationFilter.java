@@ -64,6 +64,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         try {
                 loginId = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
                     .getClaim("loginId").asString();
+                request.setAttribute("loginid",loginId);
             } catch(JWTVerificationException e) {
                 // 토큰 검증 실패 예외(만료, decode실패 등등)
                 // 1. 쿠키 제거
@@ -88,6 +89,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
             }
         if(loginId != null) {
+            request.setAttribute("loginok",true);
             Member member = memberRepository.findOneWithAuthoritiesByLoginId(loginId).get();
 
             PrincipalDetails principalDetails = new PrincipalDetails(member);
@@ -103,7 +105,5 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         chain.doFilter(request, response);
     }
-
-
 
 }
