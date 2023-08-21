@@ -1,56 +1,45 @@
 package yj.board.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.filter.CorsFilter;
-import yj.board.jwt.JwtAccessDeniedHandler;
-import yj.board.jwt.JwtAuthenticationEntryPoint;
-import yj.board.jwt.JwtSecurityConfig;
-import yj.board.jwt.TokenProvider;
+import yj.board.jwt.*;
+import yj.board.repository.MemberRepositoryV2;
 
-//@EnableWebSecurity // 기본적인 웹 보안 활성화 어노테이션
-//@EnableGlobalMethodSecurity(prePostEnabled = true)
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
+    private final AuthenticationConfiguration authenticationConfiguration;
 
-    private final TokenProvider tokenProvider;
-    private final CorsFilter corsFilter;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    @Autowired
+    private MemberRepositoryV2 memberRepository;
 
-    public WebSecurityConfig(
-            TokenProvider tokenProvider,
-            CorsFilter corsFilter,
-            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-            JwtAccessDeniedHandler jwtAccessDeniedHandler
-    ) {
-        this.tokenProvider = tokenProvider;
-        this.corsFilter = corsFilter;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
-    }
+    @Autowired
+    private PrincipalOauth2UserService principalDetailsService;
+
+    @Autowired
+    private CorsConfig corsConfig;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /*@Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests()
-                .antMatchers("/api/hello").permitAll()
-                .anyRequest().authenticated();
-        return http.build();
-    }*/
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -60,39 +49,39 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                // token을 사용하는 방식이기 때문에 csrf를 disable합니다.
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
                 .csrf().disable()
-
-                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-
-                .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .accessDeniedHandler(jwtAccessDeniedHandler)
-                .and()
-                .headers()
-                .frameOptions()
-                .sameOrigin()
+//                .addFilter(corsConfig.corsFilter())
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
 
-
-                // 세션을 사용하지 않기 때문에 STATELESS로 설정
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
-                .and()
+                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class) // 예외 처리 필터
+                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository))
                 .authorizeRequests()
-                .antMatchers("/api/hello").permitAll()
-                .antMatchers("/token/new").permitAll()
-                .antMatchers("/token").permitAll()
-                .antMatchers("/api/signup").permitAll()
-//                .antMatchers("/").permitAll()
-
-                .anyRequest().authenticated()
+                /*.antMatchers("/")
+                .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")*/
+                .antMatchers("/api/**")
+                .access("hasRole('ROLE_ADMIN')")
+                .anyRequest().permitAll()
                 .and()
-                .apply(new JwtSecurityConfig(tokenProvider));
+                .formLogin()
+                .loginPage("/token/new")
+                .loginProcessingUrl("/login")
+                .and()
+                .logout()
+                .logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true).deleteCookies("Authorization")
+                .and()
+                // oauth2 방식 로그인
+                .oauth2Login()
+                .loginPage("/token/new")
+                .successHandler(new OAuth2AuthenticationSuccessHandler())
+                .failureHandler(new OAuth2AuthenticationFailureHandler())
+                .defaultSuccessUrl("/")
+                .userInfoEndpoint()
+                .userService(principalDetailsService);
 
-        return httpSecurity.build();
+                return http.build();
     }
 }

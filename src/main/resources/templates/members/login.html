@@ -65,7 +65,7 @@
                                         <button type="submit" class="btn btn-primary btn-user btn-block"
                                         id="btnLogin">로그인</button>
                                         <hr>
-                                        <a href="../fragments/layout.html" class="btn btn-google btn-user btn-block">
+                                        <a th:href="@{/oauth2/authorization/google}" href="../fragments/layout.html" class="btn btn-google btn-user btn-block">
                                             <i class="fab fa-google fa-fw"></i> Google 로그인
                                         </a>
                                         <a href="../fragments/layout.html" class="btn btn-facebook btn-user btn-block">
@@ -130,10 +130,10 @@
                                     <!--<div class="text-center">
                                         <a class="small" href="forgot-password.html">Forgot Password?</a>
                                     </div>-->
-                                    <div class="text-center">
-<!--                                        <a class="small" th:href="@{/members/add}">Create an Account!</a>-->
+                                    <!--<div class="text-center">
+&lt;!&ndash;                                        <a class="small" th:href="@{/members/add}">Create an Account!</a>&ndash;&gt;
                                         <button type="button" class="btn btn-primary btn-user btn-block" th:onclick="|location.href='@{/members/add}'|">Sign-up</button>
-                                    </div>
+                                    </div>-->
                                 </div>
                             </div>
                         </div>

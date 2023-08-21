@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    include: oauth
 
   datasource:
     url: jdbc:oracle:thin:@localhost:1521:xe

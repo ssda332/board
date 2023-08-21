@@ -2,6 +2,7 @@ package yj.board.service;
 
 import java.util.Collections;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import yj.board.domain.dto.MemberDto;
