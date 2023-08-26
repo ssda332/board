@@ -62,7 +62,7 @@ public class WebSecurityConfig {
                 .httpBasic().disable()
 //                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class) // 예외 처리 필터
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), tokenProvider))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository, tokenProvider))
                 .authorizeRequests()
                 /*.antMatchers("/")
                 .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")*/

@@ -10,18 +10,20 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SequenceGenerator(
+/*@SequenceGenerator(
         name="TOKEN_SEQ_GEN",
         sequenceName="TOKEN_ID_SEQ",
         initialValue=1,
         allocationSize=1
-)
+)*/
 public class RefreshToken {
-    @Id
+    /*@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="TOKEN_SEQ_GEN")
     @Column(name="TOKEN_ID")
-    private Long id;
-    @Column(name = "MEM_ID", nullable = false, unique = true)
+    private Long id;*/
+    @Id
+//    @Column(name = "MEM_ID", nullable = false, unique = true)
+    @Column(name="MEM_ID")
     private Long memId;
     @Column(name = "REFRESH_TOKEN", nullable = false)
     private String refreshToken;
@@ -30,6 +32,12 @@ public class RefreshToken {
         this.refreshToken = newRefreshToken;
         return this;
     }
+
+/*    @Builder
+    public RefreshToken(Long memId, String refreshToken) {
+        this.memId = memId;
+        this.refreshToken = refreshToken;
+    }*/
 
     @Builder
     public RefreshToken(Long memId, String refreshToken) {
