@@ -31,6 +31,9 @@ public class WebSecurityConfig {
     @Autowired
     private CorsConfig corsConfig;
 
+    @Autowired
+    private TokenProvider tokenProvider;
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -55,23 +58,29 @@ public class WebSecurityConfig {
 //                .addFilter(corsConfig.corsFilter())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-
-                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class) // 예외 처리 필터
-                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+                .formLogin().disable()
+                .httpBasic().disable()
+//                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class) // 예외 처리 필터
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), tokenProvider))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository))
                 .authorizeRequests()
                 /*.antMatchers("/")
                 .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")*/
                 .antMatchers("/api/**")
-                .access("hasRole('ROLE_ADMIN')")
+                .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                 .anyRequest().permitAll()
-                .and()
+                .and();
+                /*.and()
                 .formLogin()
                 .loginPage("/token/new")
                 .loginProcessingUrl("/login")
                 .and()
                 .logout()
-                .logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true).deleteCookies("Authorization")
+                .logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true).deleteCookies("Authorization")*/
+
+
+/*
+
                 .and()
                 // oauth2 방식 로그인
                 .oauth2Login()
@@ -81,6 +90,7 @@ public class WebSecurityConfig {
                 .defaultSuccessUrl("/")
                 .userInfoEndpoint()
                 .userService(principalDetailsService);
+*/
 
                 return http.build();
     }

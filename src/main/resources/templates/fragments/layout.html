@@ -20,6 +20,7 @@
 
     <!-- Custom styles for this template-->
     <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 
 </head>
 
@@ -285,10 +286,11 @@
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
-                            <th:block sec:authorize="isAuthenticated()">
+                            <div id="authenticated">
+
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span sec:authentication="principal.member.nickname" class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                                    <span id="auth_nickname" class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
                                     <img class="img-profile rounded-circle"
                                         src="img/undraw_profile.svg">
                                 </a>
@@ -313,13 +315,12 @@
                                         Logout
                                     </a>
                                 </div>
-                            </th:block>
-                            <th:block sec:authorize="isAnonymous()">
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <button th:onclick="|location.href='@{/token/new}'|" class="btn btn-primary btn-sm" type="button" style="margin-right:5px;">로그인</button>
-                                    <button th:onclick="|location.href='@{/members}'|" class="btn btn-primary btn-sm" type="button">회원가입</button>
-                                </div>
-                            </th:block>
+                            </div>
+                            <!-- -->
+                            <div id="anonymous" class="nav-link">
+                                <button th:onclick="|location.href='@{/token/new}'|" class="btn btn-primary btn-sm" type="button" style="margin-right:5px;">로그인</button>
+                                <button th:onclick="|location.href='@{/members}'|" class="btn btn-primary btn-sm" type="button">회원가입</button>
+                            </div>
                         </li>
 
                     </ul>
@@ -460,9 +461,9 @@
                         </div>
 
                         <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
+                        <!--<div class="col-xl-4 col-lg-5">
                             <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
+                                &lt;!&ndash; Card Header - Dropdown &ndash;&gt;
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
@@ -471,7 +472,7 @@
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                                         </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated&#45;&#45;fade-in"
                                             aria-labelledby="dropdownMenuLink">
                                             <div class="dropdown-header">Dropdown Header:</div>
                                             <a class="dropdown-item" href="#">Action</a>
@@ -481,7 +482,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Card Body -->
+                                &lt;!&ndash; Card Body &ndash;&gt;
                                 <div class="card-body">
                                     <div class="chart-pie pt-4 pb-2">
                                         <canvas id="myPieChart"></canvas>
@@ -499,7 +500,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
 
                     <!-- Content Row -->
@@ -662,7 +663,7 @@
             <!-- End of Main Content -->
 
             <!-- Footer -->
-            <footer th:fragment="footer" class="sticky-footer bg-white">
+            <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
                         <span>Copyright &copy; Your Website 2021</span>
@@ -719,8 +720,30 @@
         <!-- Page level custom scripts -->
         <script src="/js/demo/chart-area-demo.js"></script>
         <script src="/js/demo/chart-pie-demo.js"></script>
+        <!--<script src="/js/common.js"/>-->
     </th:block>
-
 </body>
+<script>
+    $.ajax({
+        type: 'GET',
+        url: '/api/user',
+        contentType:'application/json; charset=utf-8',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-type","application/json");
+            xhr.setRequestHeader("Authorization", localStorage.getItem("Authorization"));
+        },
+    }).done(function(data,status,xhr) {
+        alert("ok");
+        // $("#profile").html("사용자의 ID는 " + data.user.username + "입니다.<br>10초뒤에 토큰이 만료됩니다.");
+        $("#anonymous").remove();
+        $("#auth_nickname").text(data.member.nickname);
 
+    }).fail(function(xhr, status, error){
+        alert("anonymous");
+        var jsonResponse = JSON.parse(xhr.responseText);
+        if(jsonResponse.status == "403" || jsonResponse.status == "500"){ //로그인을 안했거나 토큰이 만료됐거나
+            $("#authenticated").remove();
+        }
+    });
+</script>
 </html>
