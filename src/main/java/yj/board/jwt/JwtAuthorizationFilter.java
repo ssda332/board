@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -24,9 +26,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
-public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
+public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
 
     private MemberRepositoryV2 memberRepository;
 
@@ -38,66 +43,38 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        //String header = request.getHeader(JwtProperties.HEADER_STRING);
-        log.debug("authorization filter init");
-
-        String token = null;
-        try {
-            token = Arrays.stream(request.getCookies())
-                    .filter(cookie -> cookie.getName().equals(JwtProperties.HEADER_STRING)).findFirst().map(Cookie::getValue)
-                    .orElse(null);
-        }catch (Exception e){
-
-        }
-
-
-        if(token == null || !token.startsWith(JwtProperties.TOKEN_PREFIX)) {
+        String header = request.getHeader(JwtProperties.HEADER_STRING);
+        if(header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
             chain.doFilter(request, response);
             return;
         }
 
-        /*String token = request.getHeader(JwtProperties.HEADER_STRING)
-                .replace(JwtProperties.TOKEN_PREFIX, "");*/
-        token = token.replace(JwtProperties.TOKEN_PREFIX, "");
+        String token = request.getHeader(JwtProperties.HEADER_STRING)
+                .replace(JwtProperties.TOKEN_PREFIX, "");
 
-        String loginId = null;
-        try {
-                loginId = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
-                    .getClaim("loginId").asString();
-                request.setAttribute("loginid",loginId);
-            } catch(JWTVerificationException e) {
-                // 토큰 검증 실패 예외(만료, decode실패 등등)
-                // 1. 쿠키 제거
-                Cookie jwtCookie = new Cookie(JwtProperties.HEADER_STRING, null);
-                jwtCookie.setMaxAge(0); // 쿠키 만료시간을 0으로 설정하여 삭제
-                jwtCookie.setPath("/");
-                response.addCookie(jwtCookie);
-                throw e;
-             /*logger.info("만료된 JWT 토큰입니다.");
+        String loginId = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
+                .getClaim("loginId").asString();
 
-                // 토큰이 만료되었을 때 처리
-                // 1. 쿠키 제거
-                Cookie jwtCookie = new Cookie(JwtProperties.HEADER_STRING, null);
-                jwtCookie.setMaxAge(0); // 쿠키 만료시간을 0으로 설정하여 삭제
-                jwtCookie.setPath("/");
-                response.addCookie(jwtCookie);
-
-                // 2. 로그인 화면으로 리다이렉트
-                response.sendRedirect("/token/new"); // 로그인 화면 URL에 맞게 수정
-
-                return;*/
-
-            }
         if(loginId != null) {
-            request.setAttribute("loginok",true);
             Member member = memberRepository.findOneWithAuthoritiesByLoginId(loginId).get();
 
             PrincipalDetails principalDetails = new PrincipalDetails(member);
+
+            String authoritiesStr = principalDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.joining(","));
+
+            // 권한 가져오기
+            Collection<? extends GrantedAuthority> authorities =
+                    Arrays.stream(authoritiesStr.split(","))
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList());
+
             Authentication authentication =
                     new UsernamePasswordAuthenticationToken(
                             principalDetails,
                             null, // 패스워드는 모르니까 null 처리, 인증 용도 x
-                            principalDetails.getAuthorities());
+                            authorities);
 
             // 권한 관리를 위해 세션에 접근하여 값 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);

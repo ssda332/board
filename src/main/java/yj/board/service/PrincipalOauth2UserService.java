@@ -8,7 +8,6 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import yj.board.auth.PrincipalDetails;
-import yj.board.domain.dto.MemberDto;
 import yj.board.domain.dto.oauth2.GoogleUserInfo;
 import yj.board.domain.dto.oauth2.OAuth2UserInfo;
 import yj.board.domain.member.Authority;
@@ -16,7 +15,6 @@ import yj.board.domain.member.Member;
 import yj.board.repository.MemberRepositoryV2;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j

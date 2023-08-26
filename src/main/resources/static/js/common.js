@@ -1,3 +1,4 @@
+/*
 const ajaxCall = {
     mainCall:function(url, type, dataType, token, successCallBack){
         $.ajax({
@@ -84,4 +85,38 @@ function submitWithTokenAndRedirect(url, method, token, data) {
     // Send the request
     xhr.send(new FormData(form));
 }
+*/
 
+/*$.ajax({
+    type: 'GET',
+    url: '/api/user',
+    contentType:'application/json; charset=utf-8',
+    beforeSend: function (xhr) {
+        xhr.setRequestHeader("Content-type","application/json");
+        xhr.setRequestHeader("Authorization", localStorage.getItem("Authorization"));
+    },
+}).done(function(data,status,xhr) {
+    alert("ok");
+    // $("#profile").html("사용자의 ID는 " + data.user.username + "입니다.<br>10초뒤에 토큰이 만료됩니다.");
+    $("#anonymous").remove();
+}).fail(function(xhr, status, error){
+    alert("anonymous");
+    var jsonResponse = JSON.parse(xhr.responseText);
+    if(jsonResponse.status == "403" || jsonResponse.status == "500"){ //로그인을 안했거나 토큰이 만료됐거나
+        $("#authenticated").remove();
+    }
+});*/
+function getUserData(callbackSuccess, callbackError) {
+    alert("getUserData init");
+    $.get({
+        url: '/api/user',
+        contentType: 'application/json; charset=utf-8',
+        headers: {
+            "Authorization": localStorage.getItem("Authorization")
+        }
+    }).done(function(data, status, xhr) {
+        callbackSuccess(data);
+    }).fail(function(xhr, status, error) {
+        callbackError(error);
+    });
+}
