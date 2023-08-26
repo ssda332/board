@@ -47,12 +47,14 @@ public class ApiController {
 
     @GetMapping("/user")
     public PrincipalDetails user(Authentication authentication) {
+        // @AuthenticationPrincipal
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         System.out.println("principal : "+principal.getMember().getId());
         System.out.println("principal : "+principal.getMember().getLoginId());
         System.out.println("principal : "+principal.getMember().getPassword());
 
         return principal;
+
     }
 
     @GetMapping("/user/{username}")
@@ -60,4 +62,5 @@ public class ApiController {
     public ResponseEntity<MemberDto> getUserInfo(@PathVariable String username) {
         return ResponseEntity.ok(memberService.getUserWithAuthorities(username));
     }
+
 }

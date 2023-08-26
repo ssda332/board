@@ -34,51 +34,35 @@ import java.util.stream.Collectors;
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
 
     private MemberRepositoryV2 memberRepository;
+    private TokenProvider tokenProvider;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, MemberRepositoryV2 memberRepository) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, MemberRepositoryV2 memberRepository, TokenProvider tokenProvider) {
         super(authenticationManager);
         this.memberRepository = memberRepository;
+        this.tokenProvider = tokenProvider;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+
+        log.debug("JwtAuthorizationFilter init url : {}", request.getRequestURL());
+
         String header = request.getHeader(JwtProperties.HEADER_STRING);
         if(header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
-            chain.doFilter(request, response);
+            chain.doFilter(request, response); // Access Token 없으면 통과
             return;
         }
+
+        
 
         String token = request.getHeader(JwtProperties.HEADER_STRING)
                 .replace(JwtProperties.TOKEN_PREFIX, "");
 
-        String loginId = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
-                .getClaim("loginId").asString();
+        Authentication authentication = tokenProvider.getAuthentication(token);
 
-        if(loginId != null) {
-            Member member = memberRepository.findOneWithAuthoritiesByLoginId(loginId).get();
-
-            PrincipalDetails principalDetails = new PrincipalDetails(member);
-
-            String authoritiesStr = principalDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.joining(","));
-
-            // 권한 가져오기
-            Collection<? extends GrantedAuthority> authorities =
-                    Arrays.stream(authoritiesStr.split(","))
-                            .map(SimpleGrantedAuthority::new)
-                            .collect(Collectors.toList());
-
-            Authentication authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            principalDetails,
-                            null, // 패스워드는 모르니까 null 처리, 인증 용도 x
-                            authorities);
-
-            // 권한 관리를 위해 세션에 접근하여 값 저장
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
+        // 권한 관리를 위해 세션에 접근하여 값 저장
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         chain.doFilter(request, response);
     }

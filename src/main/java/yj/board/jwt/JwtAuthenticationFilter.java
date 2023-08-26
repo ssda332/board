@@ -41,10 +41,24 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final AuthenticationManager authenticationManager;
     private final TokenProvider tokenProvider;
 
+
+
+    /*@Override
+    protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
+
+
+        return super.requiresAuthentication(request, response);
+
+
+    }*/
+
     // 인증 요청시에 실행되는 함수 => /login
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
+
+        log.debug("JwtAuthenticationFilter init url : {}", request.getRequestURL());
+
         // request에 있는 username과 password를 파싱해서 자바 Object로 받기
         ObjectMapper om = new ObjectMapper();
         LoginDto loginRequestDto = null;
