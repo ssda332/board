@@ -1,4 +1,4 @@
-package yj.board.domain.dto;
+package yj.board.domain.token.dto;
 
 import lombok.*;
 

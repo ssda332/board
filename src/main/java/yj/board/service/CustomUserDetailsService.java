@@ -6,20 +6,18 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import yj.board.domain.member.Member;
-import yj.board.repository.MemberRepositoryV2;
+import yj.board.repository.MemberRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-//@Component("UserDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
-    private final MemberRepositoryV2 memberRepository;
+    private final MemberRepository memberRepository;
 
-    public CustomUserDetailsService(MemberRepositoryV2 memberRepository) {
+    public CustomUserDetailsService(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 
