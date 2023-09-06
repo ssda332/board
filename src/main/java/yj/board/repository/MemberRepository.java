@@ -1,19 +1,13 @@
 package yj.board.repository;
 
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
 import yj.board.domain.member.Member;
 
-import java.util.List;
 import java.util.Optional;
 
-//@Repository
-public interface MemberRepository {
-
-    List<Member> findAll();
-    Optional<Member> findByLoginId(String loginId);
-
-    Member save(@Param("member") Member member);
-
-
+public interface MemberRepository extends JpaRepository<Member, Long> {
+    @EntityGraph(attributePaths = "authorities")
+    Optional<Member> findOneWithAuthoritiesByLoginId(String loginId);
 }
+

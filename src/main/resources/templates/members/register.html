@@ -44,26 +44,16 @@
                         <div class="text-center">
                             <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
                         </div>
-<!--                        <form class="user" action="" th:action th:object="${member}" method="post">-->
-<!--                            <div class="form-group row">
-                                <div class="col-sm-6 mb-3 mb-sm-0">
-                                    <input type="text" class="form-control form-control-user" id="exampleFirstName"
-                                           placeholder="First Name">
-                                </div>
-                                <div class="col-sm-6">
-                                    <input type="text" class="form-control form-control-user" id="exampleLastName"
-                                           placeholder="Last Name">
-                                </div>
-                            </div>-->
-                        <form class="user" action="" th:action th:object="${member}" method="post">
+
+                        <!--<form class="user" action="" th:action th:object="${member}" method="post">
                             <div class="form-group">
                                 <input type="text" id="loginId" th:field="${member.loginId}" class="form-control form-control-user" placeholder="아이디를 입력하세요">
                                 <div class="field-error" th:errors="${member.loginId}" />
                             </div>
                             <div class="form-group">
-    <!--                                <div class="col-sm-6 mb-3 mb-sm-0">-->
+    &lt;!&ndash;                                <div class="col-sm-6 mb-3 mb-sm-0">&ndash;&gt;
                                 <input type="password" id="password" th:field="${member.password}" class="form-control form-control-user" placeholder="패스워드를 입력하세요">
-    <!--                                </div>-->
+    &lt;!&ndash;                                </div>&ndash;&gt;
                                 <div class="field-error" th:errors="${member.password}" />
                             </div>
                             <div class="form-group">
@@ -79,7 +69,31 @@
                             <a href="index.html" class="btn btn-facebook btn-user btn-block">
                                 <i class="fab fa-facebook-f fa-fw"></i> Register with Facebook
                             </a>
-                        </form>
+                        </form>-->
+                        <div class="form-group">
+                            <input type="text" id="loginId" class="form-control form-control-user" placeholder="아이디를 입력하세요">
+                            <div class="field-error" id="loginId-error" />
+                        </div>
+                        <div class="form-group">
+                            <!--                                <div class="col-sm-6 mb-3 mb-sm-0">-->
+                            <input type="password" id="password" class="form-control form-control-user" placeholder="패스워드를 입력하세요">
+                            <!--                                </div>-->
+                            <div class="field-error" id="password-error" />
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="nickname" class="form-control form-control-user" placeholder="닉네임을 입력하세요">
+                            <div class="field-error" id="nickname-error" />
+                        </div>
+
+                        <button id="signUp" class="btn btn-primary btn-user btn-block" type="button">회원가입</button>
+                        <hr>
+                        <a href="index.html" class="btn btn-google btn-user btn-block">
+                            <i class="fab fa-google fa-fw"></i> Register with Google
+                        </a>
+                        <a href="index.html" class="btn btn-facebook btn-user btn-block">
+                            <i class="fab fa-facebook-f fa-fw"></i> Register with Facebook
+                        </a>
+
                         <hr>
                         <div class="text-center">
                             <a class="small" href="forgot-password.html">Forgot Password?</a>
@@ -105,7 +119,51 @@
 
 <!-- Custom scripts for all pages-->
 <script src="/js/sb-admin-2.min.js"></script>
+<script src="/js/common.js"></script>
+<script>
+    $('#signUp').click(function(e) {
 
+        // 폼 데이터를 직접 객체 리터럴로 생성
+        let member = {
+            loginId: $('#loginId').val(),
+            password: $('#password').val(),
+            nickname: $('#nickname').val()
+        };
+
+        ajaxJson("POST", "/members", JSON.stringify(member), false,
+            function(data, status, xhr) {
+                alert("회원가입에 성공하였습니다.");
+                location.href="/";
+
+            },
+
+            function(xhr, status, error) {
+                let jsonResponse = JSON.parse(xhr.responseText);
+                console.log(jsonResponse);
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+                $('#loginId-error').text("");
+                $('#password-error').text("");
+                $('#nickname-error').text("");
+
+                if (jsonResponse.code == "CM_001") {
+
+                    for (var i in jsonResponse.errors) {
+                        let field = jsonResponse.errors[i].field;
+                        let reason = jsonResponse.errors[i].reason;
+
+                        if (field == "loginId") $('#loginId-error').text(reason);
+                        if (field == "password") $('#password-error').text(reason);
+                        if (field == "nickname") $('#nickname-error').text(reason);
+                    }
+                } else if (jsonResponse.code == "CM_002") {
+                    alert(jsonResponse.message);
+                }
+            });
+    });
+
+</script>
 </body>
 
 </html>

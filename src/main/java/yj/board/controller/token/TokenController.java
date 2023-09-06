@@ -1,4 +1,4 @@
-package yj.board.controller.member;
+package yj.board.controller.token;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

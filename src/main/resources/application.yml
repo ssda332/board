@@ -19,9 +19,9 @@ spring:
     defer-datasource-initialization: true
     database: oracle
 
-  sql:
-    init:
-      mode: always
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 logging:
   level:

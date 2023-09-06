@@ -1,56 +1,36 @@
 package yj.board.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import yj.board.auth.PrincipalDetails;
-import yj.board.domain.dto.LoginDto;
-import yj.board.domain.dto.TokenDto;
+import yj.board.domain.member.dto.LoginDto;
+import yj.board.domain.token.dto.TokenDto;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.security.Key;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 @Slf4j
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
 
     private final AuthenticationManager authenticationManager;
     private final TokenProvider tokenProvider;
 
-
-
-    /*@Override
-    protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
-
-
-        return super.requiresAuthentication(request, response);
-
-
-    }*/
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, TokenProvider tokenProvider) {
+        this.authenticationManager = authenticationManager;
+        this.tokenProvider = tokenProvider;
+        this.setFilterProcessesUrl(JwtProperties.AUTH_URL);
+    }
 
     // 인증 요청시에 실행되는 함수 => /login
     @Override
@@ -78,41 +58,26 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 authenticationManager.authenticate(authenticationToken);
 
         PrincipalDetails principalDetailis = (PrincipalDetails) authentication.getPrincipal();
-//        System.out.println("Authentication : " + principalDetailis.getMember().getLoginId());
         return authentication;
     }
 
-    // JWT Token 생성해서 response에 담아주기
+    // Token 생성해서 response에 담아주기
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
 
-        TokenDto tokenDto = tokenProvider.createAccessToken(authResult);
-        String jwtToken = tokenDto.getAccessToken();
-        /*PrincipalDetails principalDetailis = (PrincipalDetails) authResult.getPrincipal();
+        TokenDto tokenDto = tokenProvider.createAccessToken(authResult, request, response);
 
-        String jwtToken = JWT.create()
-                .withSubject(principalDetailis.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
-                .withClaim("id", principalDetailis.getMember().getId())
-                .withClaim("loginId", principalDetailis.getMember().getLoginId())
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));*/
+        try {
 
-        Cookie refreshToken = createCookie(tokenDto.getRefreshToken());
-
-        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken);
-        response.addCookie(refreshToken);
+        } catch (NullPointerException e) {
+            Arrays.stream(request.getCookies())
+                    .filter(cookie -> cookie.getName().equals(JwtProperties.REFRESH_HEADER_STRING))
+                    .forEach(s -> {
+                        log.debug("cookie : " + s.getValue());
+                    });
+        }
     }
 
-    public Cookie createCookie(String token) {
-        String cookieName = "refreshtoken";
-        String cookieValue = token;
-        Cookie cookie = new Cookie(cookieName, cookieValue);
-        // 쿠키 속성 설정
-        cookie.setHttpOnly(true);  //httponly 옵션 설정
-        cookie.setSecure(true); //https 옵션 설정
-        cookie.setPath("/"); // 모든 곳에서 쿠키열람이 가능하도록 설정
-        cookie.setMaxAge(JwtProperties.EXPIRATION_TIME_REFRESH); //쿠키 만료시간 설정
-        return cookie;
-    }
+
 }

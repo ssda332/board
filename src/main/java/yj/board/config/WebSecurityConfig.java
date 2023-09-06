@@ -1,8 +1,11 @@
-package yj.board.service;
+package yj.board.config;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.LegacyCookieProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,26 +16,20 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import yj.board.jwt.*;
-import yj.board.repository.MemberRepositoryV2;
+import yj.board.repository.MemberRepository;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+
     private final AuthenticationConfiguration authenticationConfiguration;
-
-    @Autowired
-    private MemberRepositoryV2 memberRepository;
-
-    @Autowired
-    private PrincipalOauth2UserService principalDetailsService;
-
-    @Autowired
-    private CorsConfig corsConfig;
-
-    @Autowired
-    private TokenProvider tokenProvider;
+    private final MemberRepository memberRepository;
+    private final TokenProvider tokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -44,23 +41,40 @@ public class WebSecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    //쿠키에 특수문자 허용해주는 프로세서로 바꿈
+    @Bean
+    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> cookieProcessorCustomizer() {
+        return (serverFactory) -> serverFactory.addContextCustomizers(
+                (context) -> context.setCookieProcessor(new LegacyCookieProcessor()));
+    }
+
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers("/xe/**", "/favicon.ico", "/error",
-                        "/vendor/**", "/css/**", "/img/**", "/js/**", "/scss/**")
+                        "/vendor/**", "/css/**", "/img/**", "/js/**", "/scss/**"
+                                ,"/token/new")
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        /*JwtAuthenticationFilter filter = new JwtAuthenticationFilter(authenticationManager(), tokenProvider);
+        filter.setFilterProcessesUrl("/token");*/
+
         http
                 .csrf().disable()
-//                .addFilter(corsConfig.corsFilter())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .formLogin().disable()
                 .httpBasic().disable()
-//                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class) // 예외 처리 필터
+
+
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler)
+                .and()
+//                .addFilterBefore(new ExceptionHandlerFilter(), UsernamePasswordAuthenticationFilter.class) // 예외 처리 필터
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), tokenProvider))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository, tokenProvider))
                 .authorizeRequests()
@@ -68,30 +82,9 @@ public class WebSecurityConfig {
                 .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")*/
                 .antMatchers("/api/**")
                 .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
-                .anyRequest().permitAll()
-                .and();
-                /*.and()
-                .formLogin()
-                .loginPage("/token/new")
-                .loginProcessingUrl("/login")
-                .and()
-                .logout()
-                .logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true).deleteCookies("Authorization")*/
-
-
-/*
-
-                .and()
-                // oauth2 방식 로그인
-                .oauth2Login()
-                .loginPage("/token/new")
-                .successHandler(new OAuth2AuthenticationSuccessHandler())
-                .failureHandler(new OAuth2AuthenticationFailureHandler())
-                .defaultSuccessUrl("/")
-                .userInfoEndpoint()
-                .userService(principalDetailsService);
-*/
+                .anyRequest().permitAll();
 
                 return http.build();
     }
+
 }

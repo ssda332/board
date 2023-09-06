@@ -30,7 +30,7 @@
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav bg-gradient-info sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="layout.html" th:href="@{/}">
@@ -286,13 +286,13 @@
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
-                            <div id="authenticated">
+                            <div id="authenticated" style="display: none">
 
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <span id="auth_nickname" class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
                                     <img class="img-profile rounded-circle"
-                                        src="img/undraw_profile.svg">
+                                        src="/img/undraw_profile.svg">
                                 </a>
                                 <!-- Dropdown - User Information -->
                                 <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -317,7 +317,7 @@
                                 </div>
                             </div>
                             <!-- -->
-                            <div id="anonymous" class="nav-link">
+                            <div id="anonymous" class="nav-link" style="display: none">
                                 <button th:onclick="|location.href='@{/token/new}'|" class="btn btn-primary btn-sm" type="button" style="margin-right:5px;">로그인</button>
                                 <button th:onclick="|location.href='@{/members}'|" class="btn btn-primary btn-sm" type="button">회원가입</button>
                             </div>
@@ -628,7 +628,7 @@
                                 <div class="card-body">
                                     <div class="text-center">
                                         <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;"
-                                            src="img/undraw_posting_photo.svg" alt="...">
+                                            src="/img/undraw_posting_photo.svg" alt="...">
                                     </div>
                                     <p>Add some quality, svg illustrations to your project courtesy of <a
                                             target="_blank" rel="nofollow" href="https://undraw.co/">unDraw</a>, a
@@ -720,33 +720,41 @@
         <!-- Page level custom scripts -->
         <script src="/js/demo/chart-area-demo.js"></script>
         <script src="/js/demo/chart-pie-demo.js"></script>
-        <!--<script src="/js/common.js"/>-->
+
     </th:block>
+    <script src="/js/common.js"></script>
+    <script>
+        ajaxJson("GET", "/api/user", null, true,
+            function(data, status, xhr) {
+                alert("ok");
+                console.log(data);
+                console.log(status);
+                console.log(xhr);
+
+                $("#authenticated").show();
+                $("#auth_nickname").text(data.nickname);
+                let jwtToken = xhr.getResponseHeader('Authorization');
+                if (jwtToken != null) {
+                    localStorage.setItem("Authorization", jwtToken);
+                }
+            },
+            function(xhr, status, error) {
+                alert("anonymous");
+                let jsonResponse = JSON.parse(xhr.responseText);
+                console.log(jsonResponse);
+                console.log(jsonResponse.status);
+
+                if(jsonResponse.status == "403"){ //로그인을 안했거나 토큰이 만료됐거나
+                    alert(jsonResponse.status);
+                    // $("#authenticated").remove();
+                    $("#anonymous").show();
+                }else if (jsonResponse.status == "401") {
+                    alert(jsonResponse.status);
+                    $("#anonymous").show();
+                    window.localStorage.clear();
+                }
+            }
+        );
+    </script>
 </body>
-<script>
-    $.ajax({
-        type: 'GET',
-        url: '/api/user',
-        contentType:'application/json; charset=utf-8',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("Content-type","application/json");
-            xhr.setRequestHeader("Authorization", localStorage.getItem("Authorization"));
-        },
-    }).done(function(data,status,xhr) {
-        alert("ok");
-        // $("#profile").html("사용자의 ID는 " + data.user.username + "입니다.<br>10초뒤에 토큰이 만료됩니다.");
-        $("#anonymous").remove();
-        $("#auth_nickname").text(data.member.nickname);
-
-    }).fail(function(xhr, status, error){
-        alert("anonymous");
-        var jsonResponse = JSON.parse(xhr.responseText);
-        if(jsonResponse.status == "403" || jsonResponse.status == "500"){ //로그인을 안했거나 토큰이 만료됐거나
-            $("#authenticated").remove();
-        }
-    });
-
-
-
-</script>
 </html>
