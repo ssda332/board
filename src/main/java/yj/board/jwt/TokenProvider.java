@@ -38,39 +38,7 @@ public class TokenProvider {
     private final RefreshTokenRepository tokenRepository;
     private final MemberRepository memberRepository;
 
-    // jwt 생성
-    @Transactional
-    public TokenDto createAccessToken(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
-        PrincipalDetails principalDetailis = (PrincipalDetails) authentication.getPrincipal();
-
-        String jwtToken = JWT.create()
-                .withSubject(principalDetailis.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
-                .withClaim("id", principalDetailis.getMember().getId())
-                .withClaim("loginId", principalDetailis.getMember().getLoginId())
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
-
-        String refToken = JWT.create()
-                .withSubject(principalDetailis.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME_REFRESH))
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
-
-        RefreshToken refreshToken = RefreshToken.builder()
-                .memId(principalDetailis.getMember().getId())
-                .refreshToken(refToken)
-                .build();
-
-        // 리프레쉬 토큰 DB저장
-        tokenRepository.save(refreshToken);
-
-        // 토큰DTO -> 클라이언트
-        TokenDto tokenDto = new TokenDto(jwtToken, refToken);
-        responseTokenDto(tokenDto, request, response);
-
-        return tokenDto;
-    }
-
-    // v2
+    // 토큰 생성
     public TokenDto createToken(Member member) {
 
         String accessToken = JWT.create()
@@ -94,16 +62,6 @@ public class TokenProvider {
         }
 
         return null;
-    }
-
-    public String resolveRefreshToken(HttpServletRequest request) {
-        String refreshToken = request.getHeader(JwtProperties.REFRESH_HEADER_STRING);
-
-        if (refreshToken != null) {
-            refreshToken = refreshToken.replace(JwtProperties.TOKEN_PREFIX, "");
-        }
-
-        return refreshToken;
     }
 
     public Authentication getAuthentication(String accessToken, HttpServletResponse response) {
@@ -156,44 +114,6 @@ public class TokenProvider {
     }
 
     /**
-     * 액세스 토큰 재발급
-     */
-    public TokenDto reissue(String accessToken, HttpServletRequest request, HttpServletResponse response) {
-        DecodedJWT decodedJWT = decodedJWT(accessToken);
-        Long memId = decodedJWT.getClaim("id").asLong();
-        String loginId = decodedJWT.getClaim("loginId").asString();
-
-        RefreshToken refreshToken = tokenRepository.findById(memId).get();
-
-        log.debug("reissue memid : {}, loginId : {}", memId, loginId);
-        log.debug("refreshToken : {}", refreshToken.getRefreshToken());
-
-        // 쿠키에서 refresh token 꺼내기
-        String cookieRefreshToken = null;
-        try {
-            cookieRefreshToken = Arrays.stream(request.getCookies())
-                    .filter(cookie -> cookie.getName().equals(JwtProperties.REFRESH_HEADER_STRING)).findFirst().map(Cookie::getValue)
-                    .orElse(null);
-        } catch (NullPointerException e) {
-            // redirect
-            log.error("refresh token expired");
-            throw new TokenExpiredException("refresh token expired {}", Instant.now());
-        }
-
-        if (validationToken(refreshToken.getRefreshToken()) && refreshToken.getRefreshToken().equals(cookieRefreshToken)) {
-            Member member = memberRepository.findOneWithAuthoritiesByLoginId(loginId).get();
-            Authentication authentication = getAuthentication(member);
-
-            return createAccessToken(authentication, request, response);
-        } else {
-            // redirect
-            log.error("refresh token expired");
-            throw new TokenExpiredException("refresh token expired {}", Instant.now());
-        }
-
-    }
-
-    /**
      * 토큰 검증
      */
 
@@ -216,22 +136,6 @@ public class TokenProvider {
 
         response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
         response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshToken);
-
-        /*Cookie[] cookies = request.getCookies();
-        if (cookies != null) { // 쿠키가 한개라도 있으면 실행
-            for (int i = 0; i < cookies.length; i++) {
-                cookies[i].setMaxAge(0); // 유효시간을 0으로 설정
-                response.addCookie(cookies[i]); // 응답에 추가하여 만료시키기.
-            }
-        }*/
-
-        /*CookieGenerator cg = new CookieGenerator();
-        cg.setCookieName(JwtProperties.REFRESH_HEADER_STRING);
-        cg.setCookieHttpOnly(true);
-        cg.setCookieSecure(true);
-        cg.setCookieMaxAge(JwtProperties.EXPIRATION_TIME_REFRESH / 1000);
-        log.debug("cookie maxAge : {}", JwtProperties.EXPIRATION_TIME_REFRESH / 1000);
-        cg.addCookie(response, refreshToken);*/
     }
 
 }

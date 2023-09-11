@@ -2,13 +2,11 @@ package yj.board.config;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.LegacyCookieProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,7 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import yj.board.jwt.*;
-import yj.board.jwt.v2.JwtFilter;
+import yj.board.jwt.JwtFilter;
 import yj.board.repository.MemberRepository;
 
 @Configuration
@@ -60,10 +58,6 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-        /*JwtAuthenticationFilter filter = new JwtAuthenticationFilter(authenticationManager(), tokenProvider);
-        filter.setFilterProcessesUrl("/token");*/
-
         http
                 .csrf().disable()
                 .formLogin().disable()
@@ -76,9 +70,6 @@ public class WebSecurityConfig {
                 .accessDeniedHandler(jwtAccessDeniedHandler)
                 .and()
 
-//                .addFilterBefore(new ExceptionHandlerFilter(), UsernamePasswordAuthenticationFilter.class) // 예외 처리 필터
-//                .addFilter(new JwtAuthenticationFilter(authenticationManager(), tokenProvider))
-//                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository, tokenProvider))
                 .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/members/member")
