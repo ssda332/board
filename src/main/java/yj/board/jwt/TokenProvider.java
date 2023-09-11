@@ -70,10 +70,45 @@ public class TokenProvider {
         return tokenDto;
     }
 
+    // v2
+    public TokenDto createToken(Member member) {
+
+        String accessToken = JWT.create()
+                .withSubject(member.getLoginId())
+                .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
+                .withClaim("id", member.getId())
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+
+        String refreshToken = JWT.create()
+                .withSubject(member.getLoginId())
+                .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME_REFRESH))
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+
+        return new TokenDto(accessToken, refreshToken);
+    }
+
+    public String resolveToken(String token) {
+        if (token != null && !token.equals("null") && !token.equals("Bearer null")) {
+            token = token.replace(JwtProperties.TOKEN_PREFIX, "");
+            return token;
+        }
+
+        return null;
+    }
+
+    public String resolveRefreshToken(HttpServletRequest request) {
+        String refreshToken = request.getHeader(JwtProperties.REFRESH_HEADER_STRING);
+
+        if (refreshToken != null) {
+            refreshToken = refreshToken.replace(JwtProperties.TOKEN_PREFIX, "");
+        }
+
+        return refreshToken;
+    }
 
     public Authentication getAuthentication(String accessToken, HttpServletResponse response) {
         DecodedJWT decodedJWT = decodedJWT(accessToken);
-        String loginId = decodedJWT.getClaim("loginId").asString();
+        String loginId = decodedJWT.getSubject();
 
         Member member = memberRepository.findOneWithAuthoritiesByLoginId(loginId).get();
 
@@ -133,6 +168,7 @@ public class TokenProvider {
         log.debug("reissue memid : {}, loginId : {}", memId, loginId);
         log.debug("refreshToken : {}", refreshToken.getRefreshToken());
 
+        // 쿠키에서 refresh token 꺼내기
         String cookieRefreshToken = null;
         try {
             cookieRefreshToken = Arrays.stream(request.getCookies())
@@ -166,7 +202,9 @@ public class TokenProvider {
             DecodedJWT verify = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token);
             return true;
         } catch (TokenExpiredException e) {
-            log.error("만료된 토큰입니다");
+            log.error("토큰 검증 실패 - 만료 TokenExpiredException");
+        } catch (JWTVerificationException e) {
+            log.error("토큰 검증 실패");
         }
         return false;
     }
@@ -176,6 +214,9 @@ public class TokenProvider {
         String accessToken = tokenDto.getAccessToken();
         String refreshToken = tokenDto.getRefreshToken();
 
+        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
+        response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshToken);
+
         /*Cookie[] cookies = request.getCookies();
         if (cookies != null) { // 쿠키가 한개라도 있으면 실행
             for (int i = 0; i < cookies.length; i++) {
@@ -184,15 +225,13 @@ public class TokenProvider {
             }
         }*/
 
-        CookieGenerator cg = new CookieGenerator();
+        /*CookieGenerator cg = new CookieGenerator();
         cg.setCookieName(JwtProperties.REFRESH_HEADER_STRING);
         cg.setCookieHttpOnly(true);
         cg.setCookieSecure(true);
         cg.setCookieMaxAge(JwtProperties.EXPIRATION_TIME_REFRESH / 1000);
         log.debug("cookie maxAge : {}", JwtProperties.EXPIRATION_TIME_REFRESH / 1000);
-        cg.addCookie(response, refreshToken);
-
-        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
+        cg.addCookie(response, refreshToken);*/
     }
 
 }
