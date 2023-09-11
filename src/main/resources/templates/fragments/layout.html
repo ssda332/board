@@ -697,7 +697,8 @@
                 <div class="modal-body">정말 로그아웃하시겠습니까?</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="../members/login.html" th:href="@{/logout}">Logout</a>
+<!--                    <a class="btn btn-primary" href="../members/login.html" th:href="@{/logout}">Logout</a>-->
+                    <button class="btn btn-primary" id="logoutBtn">Logout</button>
                 </div>
             </div>
         </div>
@@ -724,7 +725,7 @@
     </th:block>
     <script src="/js/common.js"></script>
     <script>
-        ajaxJson("GET", "/api/user", null, true,
+        /*ajaxJson("GET", "/members/member", null, true,
             function(data, status, xhr) {
                 alert("ok");
                 console.log(data);
@@ -753,6 +754,36 @@
                     $("#anonymous").show();
                     window.localStorage.clear();
                 }
+            }
+        );*/
+
+        // $("#logoutBtn").click(logout());
+        $(document).ready(function() {
+            // 버튼 클릭 이벤트 핸들러
+            $('#logoutBtn').click(function() {
+                // logout() 함수를 호출합니다.
+                logout();
+            });
+        });
+
+        tokenToJson("GET", "/members/member", null, true,
+            function(data, status, xhr) {
+                alert("ok");
+                console.log(data);
+                console.log(status);
+                console.log(xhr);
+
+                let accessToken = localStorage.getItem("Authorization");
+                let payload = JSON.parse(atob(accessToken.split(".")[1]));
+
+                console.log(payload);
+
+                $("#authenticated").show();
+                $("#auth_nickname").text(payload.sub);
+            },
+
+            function(xhr, status, error) {
+                $("#anonymous").show();
             }
         );
     </script>
