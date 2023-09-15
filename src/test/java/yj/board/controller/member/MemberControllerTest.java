@@ -1,2 +1,4 @@
-package yj.board.controller.member;public class MemberControllerTest {
+package yj.board.controller.member;
+
+public class MemberControllerTest {
 }

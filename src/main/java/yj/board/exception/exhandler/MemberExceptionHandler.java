@@ -10,6 +10,7 @@ import yj.board.domain.error.ErrorCode;
 import yj.board.domain.error.ErrorResponse;
 import yj.board.exception.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,7 @@ public class MemberExceptionHandler {
 
     /**
      * AU_004
-     *
+     * 액세스 토큰이 NULL일 때 발생 시키는 예외
      * 401
      */
     @ExceptionHandler(AccessTokenNullException.class)
@@ -94,6 +95,13 @@ public class MemberExceptionHandler {
 
     private List<ErrorResponse.FieldError> getFieldErrors(BindingResult bindingResult) {
         List<FieldError> errors = bindingResult.getFieldErrors();
+        errors.stream()
+                .forEach(s -> {
+                    System.out.println(s.getField());
+                    System.out.println(s.toString());
+                });
+
+
         return errors.parallelStream()
                 .map(error -> ErrorResponse.FieldError.builder()
                         .reason(error.getDefaultMessage())
