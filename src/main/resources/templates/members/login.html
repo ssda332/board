@@ -48,10 +48,12 @@
                                             id="username" name="username" aria-describedby="emailHelp"
                                             placeholder="Enter ID...">
                                     </div>
+                                    <div id="username-error"></div>
                                     <div class="form-group">
                                         <input type="password" class="form-control form-control-user"
                                             id="password" placeholder="Password">
                                     </div>
+                                    <div id="password-error"></div>
                                     <div class="form-group">
                                         <div class="custom-control custom-checkbox small">
                                             <input type="checkbox" class="custom-control-input" id="customCheck">
@@ -66,33 +68,8 @@
                                         <i class="fab fa-google fa-fw"></i> Google 로그인
                                     </a>
                                     <a href="../fragments/layout.html" class="btn btn-facebook btn-user btn-block">
-                                        <i class="fab fa-facebook-f fa-fw"></i> Facebook 로그인
+                                        <i class="fab fa-facebook-f fa-fw"></i> 카카오 로그인
                                     </a>
-
-                                    <!--/* jquery script */-->
-                                    <script th:inline="javascript">
-                                        function login(){
-                                            var data = {
-                                                loginId: $('#username').val(),
-                                                password: $('#password').val()
-                                            };
-
-                                            $.ajax({
-                                                type: 'POST',
-                                                url: '/token',
-                                                contentType:'application/json; charset=utf-8',
-                                                data: JSON.stringify(data),
-                                            }).done(function(data,status,xhr){
-                                                let accessToken = xhr.getResponseHeader('Authorization');
-                                                let refreshToken = xhr.getResponseHeader('refreshToken');
-                                                localStorage.setItem("Authorization", accessToken);
-                                                localStorage.setItem("refreshToken", refreshToken);
-                                                location.href = "/";
-                                            }).fail(function (error) {
-                                                alert("존재하지 않는 회원입니다.");
-                                            });
-                                        }
-                                    </script>
 
                                     <!--<hr>-->
                                     <!--<div class="text-center">
@@ -123,6 +100,34 @@
 
     <!-- Custom scripts for all pages-->
     <script src="/js/sb-admin-2.min.js"></script>
+    <script src="/js/common.js"></script>
+    <script th:inline="javascript">
+        function login(){
+            var data = {
+                loginId: $('#username').val(),
+                password: $('#password').val()
+            };
+
+            ajaxJson("POST", "/token", JSON.stringify(data), false,
+                function(data, status, xhr) {
+                    let accessToken = xhr.getResponseHeader('Authorization');
+                    let refreshToken = xhr.getResponseHeader('refreshToken');
+                    localStorage.setItem("Authorization", accessToken);
+                    localStorage.setItem("refreshToken", refreshToken);
+                    location.href = "/";
+                },
+                function(xhr, status, error) {
+                    let errorText = JSON.parse(xhr.responseText);
+
+                    if (errorText.code == "CM_001") {
+                        alert(errorText.message);
+                    } else if (errorText.code == "CM_004") {
+                        alert(errorText.message);
+                    }
+
+                });
+        }
+    </script>
 
 </body>
 

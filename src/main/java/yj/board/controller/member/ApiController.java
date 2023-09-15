@@ -43,10 +43,10 @@ public class ApiController {
 
     }
 
-    @GetMapping("/user/{username}")
+    /*@GetMapping("/user/{username}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<MemberDto> getUserInfo(@PathVariable String username) {
         return ResponseEntity.ok(memberService.getUserWithAuthorities(username));
     }
-
+*/
 }
