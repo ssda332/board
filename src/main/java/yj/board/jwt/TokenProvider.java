@@ -12,19 +12,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.CookieGenerator;
 import yj.board.auth.PrincipalDetails;
+import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.token.dto.TokenDto;
 import yj.board.domain.member.Member;
-import yj.board.domain.token.RefreshToken;
 import yj.board.repository.MemberRepository;
-import yj.board.repository.RefreshTokenRepository;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -35,20 +30,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TokenProvider {
 
-    private final RefreshTokenRepository tokenRepository;
     private final MemberRepository memberRepository;
 
     // 토큰 생성
-    public TokenDto createToken(Member member) {
+    public TokenDto createToken(MemberDto memberDto) {
 
         String accessToken = JWT.create()
-                .withSubject(member.getLoginId())
+                .withSubject(memberDto.getLoginId())
                 .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
-                .withClaim("id", member.getId())
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
         String refreshToken = JWT.create()
-                .withSubject(member.getLoginId())
+                .withSubject(memberDto.getLoginId())
                 .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME_REFRESH))
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 

@@ -79,11 +79,11 @@
             </li>
 
             <!-- Nav Item - Charts -->
-            <li class="nav-item">
+            <!--<li class="nav-item">
                 <a class="nav-link" href="charts.html">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Charts</span></a>
-            </li>
+            </li>-->
 
             <!-- Nav Item - Tables -->
             <li class="nav-item">
@@ -452,11 +452,11 @@
                                     </div>
                                 </div>
                                 <!-- Card Body -->
-                                <div class="card-body">
+                                <!--<div class="card-body">
                                     <div class="chart-area">
                                         <canvas id="myAreaChart"></canvas>
                                     </div>
-                                </div>
+                                </div>-->
                             </div>
                         </div>
 
@@ -716,67 +716,35 @@
         <script src="/js/sb-admin-2.min.js"></script>
 
         <!-- Page level plugins -->
-        <script src="/vendor/chart.js/Chart.min.js"></script>
+        <!--<script src="/vendor/chart.js/Chart.min.js"></script>-->
 
         <!-- Page level custom scripts -->
-        <script src="/js/demo/chart-area-demo.js"></script>
-        <script src="/js/demo/chart-pie-demo.js"></script>
+        <!--<script src="/js/demo/chart-area-demo.js"></script>
+        <script src="/js/demo/chart-pie-demo.js"></script>-->
 
     </th:block>
     <script src="/js/common.js"></script>
     <script>
-        /*ajaxJson("GET", "/members/member", null, true,
-            function(data, status, xhr) {
-                alert("ok");
-                console.log(data);
-                console.log(status);
-                console.log(xhr);
-
-                $("#authenticated").show();
-                $("#auth_nickname").text(data.nickname);
-                let jwtToken = xhr.getResponseHeader('Authorization');
-                if (jwtToken != null) {
-                    localStorage.setItem("Authorization", jwtToken);
-                }
-            },
-            function(xhr, status, error) {
-                alert("anonymous");
-                let jsonResponse = JSON.parse(xhr.responseText);
-                console.log(jsonResponse);
-                console.log(jsonResponse.status);
-
-                if(jsonResponse.status == "403"){ //로그인을 안했거나 토큰이 만료됐거나
-                    alert(jsonResponse.status);
-                    // $("#authenticated").remove();
-                    $("#anonymous").show();
-                }else if (jsonResponse.status == "401") {
-                    alert(jsonResponse.status);
-                    $("#anonymous").show();
-                    window.localStorage.clear();
-                }
-            }
-        );*/
-
-        // $("#logoutBtn").click(logout());
         $(document).ready(function() {
             // 버튼 클릭 이벤트 핸들러
             $('#logoutBtn').click(function() {
                 // logout() 함수를 호출합니다.
                 logout();
             });
+
         });
 
         tokenToJson("GET", "/members/member", null, true,
             function(data, status, xhr) {
-                alert("ok");
-                console.log(data);
-                console.log(status);
-                console.log(xhr);
+                // alert("ok");
+                // console.log(data);
+                // console.log(status);
+                // console.log(xhr);
 
                 let accessToken = localStorage.getItem("Authorization");
                 let payload = JSON.parse(atob(accessToken.split(".")[1]));
 
-                console.log(payload);
+                // console.log(payload);
 
                 $("#authenticated").show();
                 $("#auth_nickname").text(payload.sub);

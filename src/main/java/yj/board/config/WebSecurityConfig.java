@@ -18,7 +18,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import yj.board.jwt.*;
 import yj.board.jwt.JwtFilter;
+import yj.board.oauth2.MyAuthenticationSuccessHandler;
 import yj.board.repository.MemberRepository;
+import yj.board.service.CustomOAuth2UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -26,15 +28,12 @@ import yj.board.repository.MemberRepository;
 public class WebSecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    // OAuth2 Service
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final MyAuthenticationSuccessHandler myAuthenticationSuccessHandler;
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -79,7 +78,15 @@ public class WebSecurityConfig {
                 /*.antMatchers("/api/**")
                 .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                 .anyRequest().permitAll();*/
-                .anyRequest().permitAll();
+                .anyRequest().permitAll()
+                .and()
+
+                .oauth2Login()
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService)
+                .and()
+
+                .successHandler(myAuthenticationSuccessHandler);
 
                 return http.build();
     }

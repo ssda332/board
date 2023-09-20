@@ -62,7 +62,7 @@
                                         </div>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-user btn-block"
-                                    id="btnLogin" onclick="login()">로그인</button>
+                                    id="btnLogin" onclick="login(false)">로그인</button>
                                     <hr>
                                     <a th:href="@{/oauth2/authorization/google}" href="../fragments/layout.html" class="btn btn-google btn-user btn-block">
                                         <i class="fab fa-google fa-fw"></i> Google 로그인
@@ -102,13 +102,19 @@
     <script src="/js/sb-admin-2.min.js"></script>
     <script src="/js/common.js"></script>
     <script th:inline="javascript">
-        function login(){
-            var data = {
-                loginId: $('#username').val(),
-                password: $('#password').val()
-            };
+        function login(isOAuth2){
+            let data = null;
 
-            ajaxJson("POST", "/token", JSON.stringify(data), false,
+            if (!isOAuth2) {
+                data = {
+                    loginId: $('#username').val(),
+                    password: $('#password').val()
+                };
+
+                data = JSON.stringify(data);
+            }
+
+            ajaxJson("POST", "/token", data, false,
                 function(data, status, xhr) {
                     let accessToken = xhr.getResponseHeader('Authorization');
                     let refreshToken = xhr.getResponseHeader('refreshToken');
@@ -125,8 +131,10 @@
                         alert(errorText.message);
                     }
 
-                });
+                }
+            );
         }
+
     </script>
 
 </body>
