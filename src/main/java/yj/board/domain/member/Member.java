@@ -2,10 +2,13 @@ package yj.board.domain.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import yj.board.domain.member.dto.AuthorityDto;
+import yj.board.domain.member.dto.MemberDto;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "TB_MEM")

@@ -35,8 +35,8 @@ public class LoginController {
 
     @PostMapping("")
     public ResponseEntity<TokenDto> login(@Valid @RequestBody LoginDto loginDto, HttpServletRequest request, HttpServletResponse response) {
-        return ResponseEntity.ok(loginService.login(loginDto, request, response));
-    }
+        return ResponseEntity.ok(loginService.login(loginDto, request, response));    }
+
 
     @PutMapping("")
     public ResponseEntity<TokenDto> reissue(@RequestBody TokenDto tokenDto, HttpServletRequest request, HttpServletResponse response) {

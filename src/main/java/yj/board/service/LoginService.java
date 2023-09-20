@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import yj.board.auth.PrincipalDetails;
 import yj.board.domain.member.Member;
 import yj.board.domain.member.dto.LoginDto;
+import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.token.RefreshToken;
 import yj.board.domain.token.dto.TokenDto;
 import yj.board.exception.AccessTokenNullException;
@@ -45,7 +46,7 @@ public class LoginService {
             throw new LoginFailException();
 
         // AccessToken, RefreshToken 발급
-        TokenDto tokenDto = tokenProvider.createToken(member);
+        TokenDto tokenDto = tokenProvider.createToken(MemberDto.from(member));
 
         // RefreshToken 저장
         RefreshToken refreshToken = RefreshToken.builder()
@@ -88,7 +89,7 @@ public class LoginService {
 
         // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
 //        TokenDto newCreatedToken = jwtProvider.createTokenDto(user.getUserId(), user.getRoles());
-        TokenDto newCreatedToken = tokenProvider.createToken(member);
+        TokenDto newCreatedToken = tokenProvider.createToken(MemberDto.from(member));
         RefreshToken updateRefreshToken = refreshTokenDB.update(newCreatedToken.getRefreshToken());
         tokenRepository.save(updateRefreshToken);
         tokenProvider.responseTokenDto(newCreatedToken, request, response);

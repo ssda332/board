@@ -13,8 +13,8 @@ public interface JwtProperties {
     /**
      * 테스트용 EXPIRATION_TIME
      */
-    int EXPIRATION_TIME = 1000 * 20; // 60초 (1/1000초)
-    int EXPIRATION_TIME_REFRESH = 1000 * 60 * 1; // 30분 (1/1000초)
+    int EXPIRATION_TIME = 1000 * 30; // 60초 (1/1000초)
+    int EXPIRATION_TIME_REFRESH = 1000 * 60 * 10; // 30분 (1/1000초)
 
     String SECRET = "SomeSecretForJWTGeneration";
 
@@ -24,4 +24,7 @@ public interface JwtProperties {
 
     //Auth url
     String AUTH_URL = "/token";
+
+    // OAuth2 공통 비밀번호
+    String oauth2Password = "youngjin123";
 }
