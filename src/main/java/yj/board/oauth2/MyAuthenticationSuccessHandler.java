@@ -12,8 +12,7 @@ import yj.board.domain.member.dto.LoginDto;
 import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.token.dto.TokenDto;
 import yj.board.jwt.JwtProperties;
-import yj.board.jwt.TokenProvider;
-import yj.board.service.LoginService;
+import yj.board.service.TokenService;
 import yj.board.service.MemberService;
 
 import javax.servlet.ServletException;
@@ -29,8 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-//    private final TokenProvider tokenProvider;
-    private final LoginService loginService;
+    private final TokenService tokenService;
     private final MemberService memberService;
 
     @Override
@@ -52,7 +50,7 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
         }
 
         LoginDto loginDto = new LoginDto(memberDto.getLoginId(), memberDto.getPassword());
-        TokenDto tokenDto = loginService.login(loginDto, request, response);
+        TokenDto tokenDto = tokenService.login(loginDto);
 
 //        TokenDto tokenDto = tokenProvider.createToken(memberDto);
         String targetUrl = createTargetUrl(tokenDto);
