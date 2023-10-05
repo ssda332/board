@@ -1,6 +1,5 @@
 package yj.board.service;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -13,7 +12,6 @@ import yj.board.domain.member.dto.LoginDto;
 import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.token.RefreshToken;
 import yj.board.domain.token.dto.TokenDto;
-import yj.board.exception.AccessTokenNullException;
 import yj.board.exception.LoginFailException;
 import yj.board.exception.RefreshTokenException;
 import yj.board.exception.UserNotFoundException;
@@ -21,13 +19,10 @@ import yj.board.jwt.TokenProvider;
 import yj.board.repository.MemberRepository;
 import yj.board.repository.RefreshTokenRepository;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LoginService {
+public class TokenService {
 
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository tokenRepository;
@@ -35,7 +30,7 @@ public class LoginService {
     private final TokenProvider tokenProvider;
 
     @Transactional
-    public TokenDto login(LoginDto loginDto, HttpServletRequest request, HttpServletResponse response) {
+    public TokenDto login(LoginDto loginDto) {
 
         // 회원 정보 존재하는지 확인
         Member member = memberRepository.findOneWithAuthoritiesByLoginId(loginDto.getLoginId())
@@ -56,14 +51,12 @@ public class LoginService {
 
         // 리프레쉬 토큰 DB저장
         tokenRepository.save(refreshToken);
-        tokenProvider.responseTokenDto(tokenDto, request, response);
+
         return tokenDto;
     }
 
     @Transactional
-    public TokenDto reissue(TokenDto tokenDto, HttpServletRequest request, HttpServletResponse response) {
-        log.info(((HttpServletRequest) request).getRequestURL().toString());
-
+    public TokenDto reissue(TokenDto tokenDto) {
         String accessToken = tokenProvider.resolveToken(tokenDto.getAccessToken());
         String refreshToken = tokenProvider.resolveToken(tokenDto.getRefreshToken());
 
@@ -73,7 +66,7 @@ public class LoginService {
 
         // AccessToken 에서 Username (pk) 가져오기
 //        if (accessToken.equals("null")) throw new AccessTokenNullException();
-        Authentication authentication = tokenProvider.getAuthentication(accessToken, response);
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
 
         // user pk로 유저 검색 / repo 에 저장된 Refresh Token 이 없음
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
@@ -92,7 +85,6 @@ public class LoginService {
         TokenDto newCreatedToken = tokenProvider.createToken(MemberDto.from(member));
         RefreshToken updateRefreshToken = refreshTokenDB.update(newCreatedToken.getRefreshToken());
         tokenRepository.save(updateRefreshToken);
-        tokenProvider.responseTokenDto(newCreatedToken, request, response);
 
         return newCreatedToken;
     }

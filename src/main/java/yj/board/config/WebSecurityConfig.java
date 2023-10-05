@@ -27,7 +27,7 @@ import yj.board.service.CustomOAuth2UserService;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final AuthenticationConfiguration authenticationConfiguration;
+//    private final AuthenticationConfiguration authenticationConfiguration;
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
@@ -35,10 +35,10 @@ public class WebSecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final MyAuthenticationSuccessHandler myAuthenticationSuccessHandler;
 
-    @Bean
+/*    @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
+    }*/
 
     //쿠키에 특수문자 허용해주는 프로세서로 바꿈
     @Bean

@@ -18,7 +18,6 @@ import yj.board.domain.token.dto.TokenDto;
 import yj.board.domain.member.Member;
 import yj.board.repository.MemberRepository;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,7 +56,7 @@ public class TokenProvider {
         return null;
     }
 
-    public Authentication getAuthentication(String accessToken, HttpServletResponse response) {
+    public Authentication getAuthentication(String accessToken) {
         DecodedJWT decodedJWT = decodedJWT(accessToken);
         String loginId = decodedJWT.getSubject();
 
@@ -121,14 +120,4 @@ public class TokenProvider {
         }
         return false;
     }
-
-
-    public void responseTokenDto(TokenDto tokenDto, HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = tokenDto.getAccessToken();
-        String refreshToken = tokenDto.getRefreshToken();
-
-        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
-        response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshToken);
-    }
-
 }

@@ -1,4 +1,153 @@
 package yj.board.controller.member;
 
-public class MemberControllerTest {
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.result.JsonPathResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
+import yj.board.config.WebSecurityConfig;
+import yj.board.domain.member.Authority;
+import yj.board.domain.member.Member;
+import yj.board.domain.member.dto.AuthorityDto;
+import yj.board.domain.member.dto.LoginDto;
+import yj.board.domain.member.dto.MemberDto;
+import yj.board.exception.DuplicateMemberException;
+import yj.board.jwt.JwtAccessDeniedHandler;
+import yj.board.jwt.JwtAuthenticationEntryPoint;
+import yj.board.jwt.TokenProvider;
+import yj.board.oauth2.MyAuthenticationSuccessHandler;
+import yj.board.repository.MemberRepository;
+import yj.board.service.CustomOAuth2UserService;
+import yj.board.service.MemberService;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(MemberController.class)
+@AutoConfigureMockMvc(addFilters = false)
+class MemberControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @MockBean
+    private MemberService memberService;
+
+    @BeforeEach
+    void init() {
+
+    }
+
+    @Test
+    @DisplayName("회원가입 성공")
+    public void signUpSuccess() throws Exception {
+        //given
+        MemberDto memberDto = getMemberDto();
+//        String object = objectMapper.writeValueAsString(memberDto);
+        String object = "{\"loginId\":\"conTest1\",\"password\":\"conTest1\",\"nickname\":\"conTest1\",\"authorityDtoSet\":[{\"authorityName\":\"ROLE_USER\"}]}";
+        given(memberService.signup(any(MemberDto.class))).willReturn(memberDto);
+
+        ResultActions actions = requestRegisterUrl(object, "/members");
+
+        actions.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("loginId", "conTest1").exists())
+                .andExpect(jsonPath("nickname", "conTest1").exists())
+                .andExpect(jsonPath("authorityDtoSet[0].authorityName").value("ROLE_USER"));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 잘못된 입력")
+    public void signUpFail_wrongInput() throws Exception {
+        MemberDto memberDto = getMemberDto();
+//        String object = objectMapper.writeValueAsString(memberDto);
+        String object = "{\"loginId\":\"\",\"password\":\"\",\"nickname\":\"conTest1\",\"authorityDtoSet\":[{\"authorityName\":\"ROLE_USER\"}]}";
+        given(memberService.signup(any(MemberDto.class))).willReturn(memberDto);
+
+        ResultActions actions = requestRegisterUrl(object, "/members");
+
+        //then
+        String errorCode = "$.[?(@.code == '%s')]";
+        String errorStatus = "$.[?(@.status == '%s')]";
+
+        actions.andDo(print())
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath(errorCode, "CM_001").exists())
+                .andExpect(jsonPath(errorStatus, 400).exists());
+
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 중복된 사용자")
+    public void signUpFail_duplicateMember() throws Exception {
+        MemberDto memberDto = getMemberDto();
+//        String object = objectMapper.writeValueAsString(memberDto);
+        String object = "{\"loginId\":\"conTest1\",\"password\":\"conTest1\",\"nickname\":\"conTest1\",\"authorityDtoSet\":[{\"authorityName\":\"ROLE_USER\"}]}";
+        given(memberService.signup(any(MemberDto.class))).willThrow(new DuplicateMemberException());
+
+        ResultActions actions = requestRegisterUrl(object, "/members");
+
+        //then
+        String errorCode = "$.[?(@.code == '%s')]";
+        String errorStatus = "$.[?(@.status == '%s')]";
+
+        actions.andDo(print())
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath(errorCode, "CM_002").exists())
+                .andExpect(jsonPath(errorStatus, 409).exists());
+
+    }
+
+    private ResultActions requestRegisterUrl(String object, String url) throws Exception {
+        ResultActions actions = mockMvc.perform(post(url)
+                .content(object)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        actions = mockMvc.perform(get(url)
+                .content(object)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON));
+        return actions;
+    }
+
+    private static MemberDto getMemberDto() {
+        Set<AuthorityDto> authorities = new HashSet<>();
+        authorities.add(new AuthorityDto("ROLE_USER"));
+        return MemberDto.builder()
+                .loginId("conTest1")
+                .password("conTest1")
+                .authorityDtoSet(authorities)
+                .nickname("conTest1")
+                .build();
+    }
 }
