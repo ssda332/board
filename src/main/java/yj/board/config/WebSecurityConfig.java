@@ -73,8 +73,9 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/members/member")
                 .authenticated()
-                /*.antMatchers("/")
-                .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")*/
+                /*.antMatchers("/category/list").permitAll()
+                .antMatchers("/category/**")
+                .access("hasRole('ROLE_ADMIN')")*/
                 /*.antMatchers("/api/**")
                 .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                 .anyRequest().permitAll();*/
@@ -82,10 +83,12 @@ public class WebSecurityConfig {
                 .and()
 
                 .oauth2Login()
+                /*.redirectionEndpoint()
+                .baseUri("/")
+                .and()*/
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService)
                 .and()
-
                 .successHandler(myAuthenticationSuccessHandler);
 
                 return http.build();

@@ -12,6 +12,7 @@ import yj.board.domain.member.Member;
 import yj.board.domain.token.RefreshToken;
 import yj.board.jwt.JwtProperties;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 
@@ -40,6 +41,8 @@ class RefreshTokenRepositoryTest {
                 .nickname("tokenTest")
                 .authorities(Collections.singleton(authority))
                 .activated(true)
+                .regDate(LocalDateTime.now())
+                .uptDate(LocalDateTime.now())
                 .build();
 
         Member savedMember = memberRepository.save(member);

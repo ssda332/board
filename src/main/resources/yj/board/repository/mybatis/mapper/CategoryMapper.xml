@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="yj.board.repository.mybatis.mapper.CategoryMapper">
+    <select id="findAll" resultType="CategoryDto">
+        SELECT CTG_ID, CTG_TITLE, CTG_HIERACHY, CTG_SORT, CTG_PRT_ID
+        FROM TB_ARTICLE_CTG
+        START WITH CTG_PRT_ID is null
+        CONNECT BY PRIOR CTG_ID = CTG_PRT_ID
+        ORDER SIBLINGS by CTG_SORT
+    </select>
+
+</mapper>

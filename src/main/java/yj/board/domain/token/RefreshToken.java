@@ -6,7 +6,7 @@ import yj.board.domain.member.Member;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "TB_REFRESH_TOKEN")
+@Table(name = "TB_REF_TKN")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,7 +27,7 @@ public class RefreshToken {
     @Column(name="MEM_ID")
     private Long memId;
 
-    @Column(name = "REFRESH_TOKEN", nullable = false)
+    @Column(name = "REF_TKN", nullable = false)
     private String refreshToken;
 
     @OneToOne

@@ -1,16 +1,24 @@
 package yj.board.domain.member;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import yj.board.domain.member.dto.AuthorityDto;
 import yj.board.domain.member.dto.MemberDto;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
+//@EntityListeners(AuditingEntityListener.class)
 @Table(name = "TB_MEM")
 @Getter
 @Setter
@@ -23,6 +31,7 @@ import java.util.stream.Collectors;
         initialValue=1, //시작값
         allocationSize=1 //메모리를 통해 할당할 범위 사이즈
 )
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "MEM_ID")
 public class Member {
 
     @JsonIgnore
@@ -44,6 +53,14 @@ public class Member {
 
     @Column(name = "MEM_ACTIVATED")
     private boolean activated;
+
+    @Column(name = "MEM_REG_DATE", nullable = false, updatable = false)
+    @CreatedDate
+    private LocalDateTime regDate; // 데이터 타입 변경
+
+    @Column(name = "MEM_UPT_DATE")
+    @LastModifiedDate
+    private LocalDateTime uptDate; // 데이터 타입 변경
 
     @ManyToMany
     @JoinTable(

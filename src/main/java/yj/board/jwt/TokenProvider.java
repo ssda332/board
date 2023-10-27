@@ -14,6 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import yj.board.auth.PrincipalDetails;
 import yj.board.domain.member.dto.MemberDto;
+import yj.board.domain.member.dto.MemberInfoDto;
 import yj.board.domain.token.dto.TokenDto;
 import yj.board.domain.member.Member;
 import yj.board.repository.MemberRepository;
@@ -32,15 +33,16 @@ public class TokenProvider {
     private final MemberRepository memberRepository;
 
     // 토큰 생성
-    public TokenDto createToken(MemberDto memberDto) {
+    public TokenDto createToken(MemberInfoDto memberInfoDto) {
 
         String accessToken = JWT.create()
-                .withSubject(memberDto.getLoginId())
+                .withSubject(memberInfoDto.getLoginId())
                 .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
         String refreshToken = JWT.create()
-                .withSubject(memberDto.getLoginId())
+                .withSubject(memberInfoDto.getLoginId())
+                .withClaim("memId", memberInfoDto.getId())
                 .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME_REFRESH))
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 

@@ -53,6 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(MemberController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@MockBean(JpaMetamodelMappingContext.class)
 class MemberControllerTest {
 
     @Autowired
@@ -127,13 +128,20 @@ class MemberControllerTest {
 
     }
 
+    @Test
+    @DisplayName("회원 정보 변경 - 닉네임 변경 성공")
+    public void updateMember_success() throws Exception {
+        MemberDto memberDto = getMemberDto();
+
+    }
+
     private ResultActions requestRegisterUrl(String object, String url) throws Exception {
         ResultActions actions = mockMvc.perform(post(url)
                 .content(object)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON));
 
-        actions = mockMvc.perform(get(url)
+        actions = mockMvc.perform(post(url)
                 .content(object)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON));

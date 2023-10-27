@@ -8,6 +8,7 @@ public enum ErrorCode {
     CONFLICT_USER_ALREADY_EXISTS("CM_002", "이미 가입된 사용자가 존재합니다.", 409),
     USER_NOT_FOUND("CM_003", "사용자를 찾을 수 없습니다.", 404),
     LOGIN_FAIL("CM_004", "로그인에 실패하였습니다.", 401),
+    UPDATE_MEMBER_FAIL("CM_005", "회원 수정에 실패하였습니다.", 400),
 
     AUTH_ENTRY_POINT("AU_001", "인증에 실패하였습니다.", 401),
     ACCESS_DENIED("AU_002", "권한이 없습니다.", 403),

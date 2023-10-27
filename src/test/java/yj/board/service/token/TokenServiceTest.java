@@ -19,7 +19,9 @@ import yj.board.domain.member.Authority;
 import yj.board.domain.member.Member;
 import yj.board.domain.member.dto.LoginDto;
 import yj.board.domain.member.dto.MemberDto;
+import yj.board.domain.member.dto.MemberInfoDto;
 import yj.board.domain.token.RefreshToken;
+import yj.board.domain.token.dto.ReissueTokenDto;
 import yj.board.domain.token.dto.TokenDto;
 import yj.board.exception.LoginFailException;
 import yj.board.exception.RefreshTokenException;
@@ -29,6 +31,7 @@ import yj.board.repository.MemberRepository;
 import yj.board.repository.RefreshTokenRepository;
 import yj.board.service.TokenService;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,7 +64,7 @@ class TokenServiceTest {
 
         given(memberRepository.findOneWithAuthoritiesByLoginId(any(String.class))).willReturn(Optional.of(member));
         given(tokenRepository.save(any(RefreshToken.class))).willReturn(refreshToken);
-        given(tokenProvider.createToken(any(MemberDto.class))).willReturn(tokenDto);
+        given(tokenProvider.createToken(any(MemberInfoDto.class))).willReturn(tokenDto);
 
         //when
         TokenDto result = tokenService.login(loginDto);
@@ -107,14 +110,14 @@ class TokenServiceTest {
         given(tokenProvider.getAuthentication(any(String.class))).willReturn(authentication);
         given(memberRepository.findById(any())).willReturn(Optional.of(member));
         given(tokenRepository.findById(any())).willReturn(Optional.of(refreshToken));
-        given(tokenProvider.createToken(any(MemberDto.class))).willReturn(tokenDto);
+        given(tokenProvider.createToken(any(MemberInfoDto.class))).willReturn(tokenDto);
 
         //when
-        TokenDto newTokenDto = tokenService.reissue(tokenDto);
+        ReissueTokenDto reissue = tokenService.reissue(tokenDto);
 
         //then
-        Assertions.assertThat(newTokenDto.getAccessToken()).isEqualTo("testToken");
-        Assertions.assertThat(newTokenDto.getRefreshToken()).isEqualTo("testToken");
+        Assertions.assertThat(reissue.getAccessToken()).isEqualTo("testToken");
+        Assertions.assertThat(reissue.getRefreshToken()).isEqualTo("testToken");
 
     }
 
@@ -210,6 +213,8 @@ class TokenServiceTest {
                 .nickname("loginTest")
                 .authorities(authorities)
                 .activated(true)
+                .regDate(LocalDateTime.now())
+                .uptDate(LocalDateTime.now())
                 .build();
         return member;
     }

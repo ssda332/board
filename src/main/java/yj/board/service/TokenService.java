@@ -10,7 +10,9 @@ import yj.board.auth.PrincipalDetails;
 import yj.board.domain.member.Member;
 import yj.board.domain.member.dto.LoginDto;
 import yj.board.domain.member.dto.MemberDto;
+import yj.board.domain.member.dto.MemberInfoDto;
 import yj.board.domain.token.RefreshToken;
+import yj.board.domain.token.dto.ReissueTokenDto;
 import yj.board.domain.token.dto.TokenDto;
 import yj.board.exception.LoginFailException;
 import yj.board.exception.RefreshTokenException;
@@ -41,7 +43,7 @@ public class TokenService {
             throw new LoginFailException();
 
         // AccessToken, RefreshToken 발급
-        TokenDto tokenDto = tokenProvider.createToken(MemberDto.from(member));
+        TokenDto tokenDto = tokenProvider.createToken(MemberInfoDto.from(member));
 
         // RefreshToken 저장
         RefreshToken refreshToken = RefreshToken.builder()
@@ -56,7 +58,7 @@ public class TokenService {
     }
 
     @Transactional
-    public TokenDto reissue(TokenDto tokenDto) {
+    public ReissueTokenDto reissue(TokenDto tokenDto) {
         String accessToken = tokenProvider.resolveToken(tokenDto.getAccessToken());
         String refreshToken = tokenProvider.resolveToken(tokenDto.getRefreshToken());
 
@@ -77,15 +79,23 @@ public class TokenService {
                 .orElseThrow(RefreshTokenException::new);
 
         // 리프레시 토큰 불일치 에러
-        if (!refreshTokenDB.getRefreshToken().equals(refreshToken))
+        if (!refreshTokenDB.getRefreshToken().equals(refreshToken)) {
             throw new RefreshTokenException();
+        }
 
         // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
 //        TokenDto newCreatedToken = jwtProvider.createTokenDto(user.getUserId(), user.getRoles());
-        TokenDto newCreatedToken = tokenProvider.createToken(MemberDto.from(member));
+        TokenDto newCreatedToken = tokenProvider.createToken(MemberInfoDto.from(member));
         RefreshToken updateRefreshToken = refreshTokenDB.update(newCreatedToken.getRefreshToken());
         tokenRepository.save(updateRefreshToken);
 
-        return newCreatedToken;
+        // TokenDto, MemberDto -> ReissueTokenDto에 담아서 리턴
+        ReissueTokenDto reissueTokenDto = ReissueTokenDto.builder()
+                .accessToken(newCreatedToken.getAccessToken())
+                .refreshToken(newCreatedToken.getRefreshToken())
+                .memberDto(MemberDto.from(member))
+                .build();
+
+        return reissueTokenDto;
     }
 }

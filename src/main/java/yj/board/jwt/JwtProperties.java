@@ -13,8 +13,8 @@ public interface JwtProperties {
     /**
      * 테스트용 EXPIRATION_TIME
      */
-    int EXPIRATION_TIME = 1000 * 30; // 60초 (1/1000초)
-    int EXPIRATION_TIME_REFRESH = 1000 * 60 * 10; // 30분 (1/1000초)
+    int EXPIRATION_TIME = 1000 * 10 ; // 10초 (1/1000초)
+    int EXPIRATION_TIME_REFRESH = 1000 * 60 * 60 * 24; // 24시간 (1/1000초)
 
     String SECRET = "SomeSecretForJWTGeneration";
 

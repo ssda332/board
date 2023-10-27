@@ -46,66 +46,13 @@
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
                 <a class="nav-link" th:href="@{/}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
-            </li>
+                    <i class="fas fa-fw fa-tablets"></i>
+                    <span>
+                        전체 글보기
+                    </span>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Addons
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
-                    aria-expanded="true" aria-controls="collapsePages">
-                    <i class="fas fa-fw fa-folder"></i>
-                    <span>게시판 목록</span>
                 </a>
-                <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="../members/login.html">게시판1</a>
-                        <a class="collapse-item" href="register.html">게시판2</a>
-                        <a class="collapse-item" href="forgot-password.html">게시판3</a>
-                        <!--<div class="collapse-divider"></div>
-                        <h6 class="collapse-header">Other Pages:</h6>
-                        <a class="collapse-item" href="404.html">404 Page</a>
-                        <a class="collapse-item" href="layout.html">Blank Page</a>-->
-                    </div>
-                </div>
             </li>
-
-            <!-- Nav Item - Charts -->
-            <!--<li class="nav-item">
-                <a class="nav-link" href="charts.html">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Charts</span></a>
-            </li>-->
-
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Tables</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
-
-            <!-- Sidebar Message -->
-            <!--<div class="sidebar-card d-none d-lg-flex">
-                <img class="sidebar-card-illustration mb-2" src="img/undraw_rocket.svg" alt="...">
-                <p class="text-center mb-2"><strong>SB Admin Pro</strong> is packed with premium features, components, and more!</p>
-                <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">Upgrade to Pro!</a>
-            </div>-->
 
         </ul>
         <!-- End of Sidebar -->
@@ -295,20 +242,12 @@
                                         src="/img/undraw_profile.svg">
                                 </a>
                                 <!-- Dropdown - User Information -->
-                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                <div id="user-information" class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                     aria-labelledby="userDropdown">
-                                    <a class="dropdown-item" href="#">
+                                    <a class="dropdown-item" id="member_mypage" href="/members/member/mypage">
                                         <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                        Profile
+                                        MyPage
                                     </a>
-                                    <!--<a class="dropdown-item" href="#">
-                                        <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                        Settings
-                                    </a>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                        Activity Log
-                                    </a>-->
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                         <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -652,7 +591,6 @@
                                         Bootstrap framework, especially the utility classes.</p>
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -724,27 +662,62 @@
 
     </th:block>
     <script src="/js/common.js"></script>
-    <script>
+    <script src="/js/common_hierachy.js"></script>
+    <script th:inline="javascript">
+        var memberDto;
         $(document).ready(function() {
             // 버튼 클릭 이벤트 핸들러
             $('#logoutBtn').click(function() {
                 // logout() 함수를 호출합니다.
                 logout();
+
+            });
+
+            $('#category-edit').click(function() {
+
+                // 권한 검색
+                tokenToJson("GET", "/category", null, true,
+                    function(data, status, xhr) {
+                        console.log(data);
+                        $('html').html(data);
+                    },
+
+                    function(xhr, status, error) {
+                        $("#anonymous").show();
+                    }
+                );
             });
 
         });
 
+        // 권한 검색
         tokenToJson("GET", "/members/member", null, true,
             function(data, status, xhr) {
                 // alert("ok");
-                // console.log(data);
-                // console.log(status);
-                // console.log(xhr);
+                console.log("/members/member");
+                console.log(data);
+                window.memberDto = data;
+                // ADMIN 권한일때
+                if (hasRoleAdmin(data.authorityDtoSet)) {
+                    addAdminMenu();
+                }
 
                 let accessToken = localStorage.getItem("Authorization");
+                let refreshToken = localStorage.getItem("refreshToken");
                 let payload = JSON.parse(atob(accessToken.split(".")[1]));
+                let refPayload = JSON.parse(atob(refreshToken.split(".")[1]));
 
-                // console.log(payload);
+                console.log("payload");
+                console.log(payload);
+                console.log("refPayload");
+                console.log(refPayload);
+
+                // member_mypage - mypage tag id
+                /*let myPageLinkTag = document.getElementById('member_mypage');
+                if (myPageLinkTag) {
+                    // JSON 데이터에서 URL 값을 가져와서 <a> 태그의 href 속성을 설정
+                    myPageLinkTag.href = '/members/member/' + refPayload.sub;
+                }*/
 
                 $("#authenticated").show();
                 $("#auth_nickname").text(payload.sub);
@@ -754,6 +727,24 @@
                 $("#anonymous").show();
             }
         );
+
+        // 모든 카테고리 조회
+        ajaxJson("GET", "/category/list", null, false,
+            function(data, status, xhr) {
+                var categoryList = data; // 받아온 JSON 데이터
+                let html = category_hireachy(categoryList);
+
+                // 결과 HTML을 특정 div에 추가
+                document.getElementById('accordionSidebar').innerHTML += html;
+            },
+
+            function(xhr, status, error) {
+                alert("카테고리 조회 실패!");
+            }
+        );
+
+
+
     </script>
 </body>
 </html>

@@ -8,6 +8,7 @@
 - SpringBoot 2.7.14
 - SpringBoot Security
 - Spring Data JPA
+- Mybatis
 
 ### DB
 - Oracle
@@ -21,3 +22,6 @@
 - Spring Security와 JWT을 이용한 인증/인가 처리
 - REST 기반의 서비스 API 구현
 - CI/CD 무중단 배포
+
+* * *
+## 

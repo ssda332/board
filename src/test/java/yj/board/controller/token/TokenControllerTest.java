@@ -7,13 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import yj.board.domain.member.dto.AuthorityDto;
 import yj.board.domain.member.dto.LoginDto;
+import yj.board.domain.member.dto.MemberDto;
+import yj.board.domain.token.dto.ReissueTokenDto;
 import yj.board.domain.token.dto.TokenDto;
 import yj.board.exception.LoginFailException;
 import yj.board.service.TokenService;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -24,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(TokenController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@MockBean(JpaMetamodelMappingContext.class)
 class TokenControllerTest {
 
     @Autowired
@@ -85,8 +93,8 @@ class TokenControllerTest {
         String newAccessToken = "new";
         String newRefreshToken = "new";
         String object = objectMapper.writeValueAsString(tokenDto);
-        given(tokenService.reissue(any(TokenDto.class))).willReturn(tokenDto = TokenDto.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build());
-
+//        given(tokenService.reissue(any(TokenDto.class))).willReturn(tokenDto = TokenDto.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build());
+        given(tokenService.reissue(any(TokenDto.class))).willReturn(ReissueTokenDto.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).memberDto(getMemberDto()).build());
         //when
         ResultActions actions = requestRegisterUrl(object, "/token", "put");
 
@@ -126,6 +134,17 @@ class TokenControllerTest {
                 .refreshToken("testRefreshToken")
                 .build();
         return tokenDto;
+    }
+
+    private static MemberDto getMemberDto() {
+        Set<AuthorityDto> authorities = new HashSet<>();
+        authorities.add(new AuthorityDto("ROLE_USER"));
+        return MemberDto.builder()
+                .loginId("conTest1")
+                .password("conTest1")
+                .authorityDtoSet(authorities)
+                .nickname("conTest1")
+                .build();
     }
 
 }

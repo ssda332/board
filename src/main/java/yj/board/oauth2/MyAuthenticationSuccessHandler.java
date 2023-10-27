@@ -16,6 +16,7 @@ import yj.board.service.TokenService;
 import yj.board.service.MemberService;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -46,14 +47,21 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
         memberDto.setPassword(JwtProperties.oauth2Password);
 
         if (!isExist) {
+            // 회원가입이 되어있지 않을 경우, 자동 회원가입 수행
             memberDto = memberService.signup(memberDto);
         }
 
-        LoginDto loginDto = new LoginDto(memberDto.getLoginId(), memberDto.getPassword());
+        LoginDto loginDto = new LoginDto(memberDto.getLoginId(), JwtProperties.oauth2Password);
         TokenDto tokenDto = tokenService.login(loginDto);
 
 //        TokenDto tokenDto = tokenProvider.createToken(memberDto);
         String targetUrl = createTargetUrl(tokenDto);
+
+        /*Cookie accessToken = new Cookie(JwtProperties.HEADER_STRING, tokenDto.getAccessToken());
+        Cookie refreshToken = new Cookie(JwtProperties.REFRESH_HEADER_STRING, tokenDto.getRefreshToken());
+//        request.setAttribute("oauth2test", "oauth2test");
+        response.addCookie(accessToken);
+        response.addCookie(refreshToken);*/
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
 

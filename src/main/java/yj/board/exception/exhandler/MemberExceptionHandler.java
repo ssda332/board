@@ -49,6 +49,12 @@ public class MemberExceptionHandler {
         return buildFieldErrors(ErrorCode.USER_NOT_FOUND, null);
     }
 
+    @ExceptionHandler(MemberUpdateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ErrorResponse handleMemberUpdateException(UserNotFoundException e) {
+        return buildFieldErrors(ErrorCode.UPDATE_MEMBER_FAIL, null);
+    }
+
     /**
      * AU_001
      * 전달한 Jwt 이 정상적이지 않은 경우 발생 시키는 예외
