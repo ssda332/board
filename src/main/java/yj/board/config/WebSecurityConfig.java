@@ -7,6 +7,7 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -73,6 +74,8 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/members/member")
                 .authenticated()
+                .antMatchers(HttpMethod.POST, "/category/list")
+                .access("hasRole('ROLE_ADMIN')")
                 /*.antMatchers("/category/list").permitAll()
                 .antMatchers("/category/**")
                 .access("hasRole('ROLE_ADMIN')")*/

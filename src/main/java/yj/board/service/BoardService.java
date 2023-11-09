@@ -16,4 +16,6 @@ public class BoardService {
     @Qualifier("myBatisBoardRepository")
     private final BoardRepository boardRepository;
 
+
+
 }

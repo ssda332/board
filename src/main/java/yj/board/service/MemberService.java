@@ -1,10 +1,7 @@
 package yj.board.service;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,8 +11,8 @@ import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.member.Authority;
 import yj.board.domain.member.Member;
 import yj.board.domain.member.dto.MemberUpdateDto;
-import yj.board.exception.DuplicateMemberException;
-import yj.board.exception.MemberUpdateException;
+import yj.board.exception.member.DuplicateMemberException;
+import yj.board.exception.member.MemberUpdateException;
 import yj.board.repository.MemberRepository;
 import yj.board.util.SecurityUtil;
 

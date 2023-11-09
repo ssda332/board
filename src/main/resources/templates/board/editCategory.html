@@ -9,73 +9,131 @@
         gap: 10px; /* a 태그 사이의 간격을 조절합니다. */
     }
 
+    .list-group-item.active {
+        background-color: darkblue;
+        color: white;
+    }
 </style>
 <body>
 <section class="container-fluid">
     <h1 class="h3 mb-2 text-gray-800">카테고리 수정</h1>
     <hr>
-    <div class="main-content col-lg-6">
-        <!-- 카테고리 그룹 -->
-        <ul class="list-group mb-4">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>리스트아이템11</div>
-                <div class="action-buttons">
-                    <a href="#" class="btn btn-danger btn-circle btn-sm">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                </div>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                A second list item
-                <div class="action-buttons">
-                    <a href="#" class="btn btn-danger btn-circle btn-sm">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                </div>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                A third list item
-                <div class="action-buttons">
-                    <a href="#" class="btn btn-danger btn-circle btn-sm">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                </div>
-            </li>
-        </ul>
-        <script th:inline="javascript">
-            // data 변수에 접근
-            //
-            // 모든 카테고리 조회
-            ajaxJson("GET", "/category/list", null, false,
-                function(data, status, xhr) {
-                    /*var categoryList = data; // 받아온 JSON 데이터
-                    let html = category_hireachy(categoryList);
+    <div class="row">
+        <div class="main-content col-lg-6">
+            <!-- 카테고리 그룹 -->
+            <ul class="list-group mb-4" id="category_box" style="max-height: 500px; overflow-y: auto">
+                <!-- 동적 생성 -->
+            </ul>
+        </div>
+        <div class="main-content col-lg-6">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">카테고리명</span>
+                <input id="input_title" type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
 
-                    // 결과 HTML을 특정 div에 추가
-                    document.getElementById('accordionSidebar').innerHTML += html;*/
+            <button id="category_save" type="button" class="btn btn-primary">저장</button>
+            <button id="category_add" type="button" class="btn btn-primary">추가</button>
 
-                },
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button id="move_up" type="button" class="btn btn-primary">위</button>
+                <button id="move_down" type="button" class="btn btn-primary">아래</button>
+            </div>
+        </div>
+    </div>
 
-                function(xhr, status, error) {
-                    alert("카테고리 조회 실패!");
-                }
-            );
+    <script src="/js/common.js"></script>
+    <script th:inline="javascript">
+        const inputTitleElement = document.getElementById("input_title"); // input 태그 가져오기
+        const ulElement = document.getElementById("category_box");
+        let clickedLi = null;
+
+        // 권한 검색
+        tokenToJson("POST", "/category/list", null, true,
+            function(data, status, xhr) {
+                renderEditCategory(data, ulElement);
+            },
+
+            function(xhr, status, error) {
+                alert("권한이 없습니다.");
+                location.href = "/";
+            }
+        );
+
+        // 클릭한 컴포넌트 활성화
+        ulElement.addEventListener("click", function (event) {
+            selectLi(event, ulElement);
+        });
+
+        // input 요소의 입력 이벤트를 사용하여 선택한 li의 ctgTitle 값을 업데이트
+        inputTitleElement.addEventListener("input", function () {
+            writeTitle(ulElement);
+        });
+
+        // "저장" 버튼 클릭 시 JSON 데이터를 저장
+        document.getElementById("category_save").addEventListener("click", function () {
+            // JSON 데이터를 담을 배열
+            const jsonData = [];
+
+            // <ul> 요소의 각 <li>를 순회하며 데이터 추출
+            ulElement.querySelectorAll("li").forEach((liElement, index) => {
+                const ctgTitle = liElement.querySelector("[id^=ctgTitle_]").textContent;
+                const ctgHierachy = liElement.querySelector("[id^=hierachy_]").textContent;
+                const ctgId = liElement.querySelector("[id^=ctgId_]").textContent;
+                const ctgPrtId = liElement.querySelector("[id^=ctgPrtId_]").textContent;
+                const ctgSort = liElement.querySelector("[id^=sort_]").textContent;
+                const status = liElement.querySelector("[id^=status_]").textContent;
+
+                // 추출한 데이터를 객체로 만들어 배열에 추가
+                const categoryData = {
+                    ctgTitle,
+                    ctgHierachy,
+                    ctgId,
+                    ctgPrtId,
+                    ctgSort,
+                    status
+                };
+                jsonData.push(categoryData);
+            });
+
+            // jsonData 배열을 JSON 문자열로 변환
+            const jsonString = JSON.stringify(jsonData);
 
             // 권한 검색
-            tokenToJson("GET", "/members/member", null, true,
+            tokenToJson("PUT", "/category/list", jsonString, true,
                 function(data, status, xhr) {
-
+                    alert("카테고리 변경에 성공했습니다.");
+                    renderEditCategory(data, ulElement);
                 },
 
                 function(xhr, status, error) {
-
+                    alert("카테고리 변경에 실패했습니다.");
                 }
             );
 
+            // 변환된 JSON 데이터 출력 (나중에 대체)
+            console.log(jsonString);
 
+            // 여기에 JSON 데이터를 서버로 보내는 로직을 추가하면 됩니다.
+        });
 
-        </script>
-    </div>
+        // 추가 버튼에 대한 클릭 이벤트 리스너 등록
+        document.getElementById("category_add").addEventListener("click", function () {
+            insertNewCategory(ulElement);
+        });
+
+        // 위 버튼 클릭 이벤트
+        document.getElementById("move_up").addEventListener("click", function () {
+            ctgMoveUp(clickedLi);
+
+        });
+
+        // 아래 버튼 클릭 이벤트
+        document.getElementById("move_down").addEventListener("click", function () {
+            ctgMoveDown(clickedLi);
+        });
+
+    </script>
+    <script src="/js/common_hierachy.js"></script>
 </section>
 </body>
 </html>

@@ -1,4 +1,4 @@
-package yj.board.exception;
+package yj.board.exception.member;
 
 public class AccessTokenNullException extends RuntimeException{
     public AccessTokenNullException() {

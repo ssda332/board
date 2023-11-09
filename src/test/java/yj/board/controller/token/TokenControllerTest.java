@@ -16,7 +16,7 @@ import yj.board.domain.member.dto.LoginDto;
 import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.token.dto.ReissueTokenDto;
 import yj.board.domain.token.dto.TokenDto;
-import yj.board.exception.LoginFailException;
+import yj.board.exception.member.LoginFailException;
 import yj.board.service.TokenService;
 
 import java.util.HashSet;

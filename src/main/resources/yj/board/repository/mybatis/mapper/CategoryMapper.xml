@@ -5,9 +5,48 @@
     <select id="findAll" resultType="CategoryDto">
         SELECT CTG_ID, CTG_TITLE, CTG_HIERACHY, CTG_SORT, CTG_PRT_ID
         FROM TB_ARTICLE_CTG
+        WHERE CTG_ACTIVATED = 0
         START WITH CTG_PRT_ID is null
         CONNECT BY PRIOR CTG_ID = CTG_PRT_ID
         ORDER SIBLINGS by CTG_SORT
     </select>
+
+    <select id="findAll_edit" resultType="CategoryEditDto">
+        SELECT CTG_ID, CTG_TITLE, CTG_HIERACHY, CTG_SORT, CTG_PRT_ID,
+               (SELECT CTG_TITLE
+                FROM TB_ARTICLE_CTG X
+                WHERE A.CTG_PRT_ID = X.CTG_ID) AS CTG_PRT_TITLE
+--,substr(sys_connect_by_path ( CTG_TITLE, ' > '),4) chart
+        FROM TB_ARTICLE_CTG A
+        WHERE CTG_ACTIVATED = 0
+        START WITH CTG_PRT_ID is null
+        CONNECT BY PRIOR CTG_ID = CTG_PRT_ID
+        ORDER SIBLINGS by CTG_SORT
+    </select>
+
+    <select id="selectNewCtgId" resultType="java.lang.Long">
+        SELECT CTG_ID_SEQ.NEXTVAL
+        FROM DUAL
+    </select>
+
+    <insert id="insertCategory">
+        INSERT INTO TB_ARTICLE_CTG (CTG_ID, CTG_TITLE, CTG_HIERACHY, CTG_REG_DATE, CTG_UPT_DATE, CTG_SORT, CTG_PRT_ID, CTG_ACTIVATED)
+        VALUES (#{ctgId}, #{ctgTitle}, #{ctgHierachy}, SYSDATE, SYSDATE, #{ctgSort}, #{ctgPrtId}, 0)
+    </insert>
+
+    <update id="updateCategory">
+        UPDATE  TB_ARTICLE_CTG
+        SET     CTG_TITLE=#{ctgTitle},
+                CTG_SORT=#{ctgSort},
+                CTG_REG_DATE=SYSDATE
+        WHERE   CTG_ID = #{ctgId}
+    </update>
+
+    <update id="deleteCategory">
+        update  TB_ARTICLE_CTG
+        set     CTG_ACTIVATED=1
+        where   CTG_ID = #{ctgId}
+    </update>
+
 
 </mapper>

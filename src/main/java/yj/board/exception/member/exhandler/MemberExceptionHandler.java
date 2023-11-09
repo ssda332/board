@@ -1,4 +1,4 @@
-package yj.board.exception.exhandler;
+package yj.board.exception.member.exhandler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -8,9 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import yj.board.domain.error.ErrorCode;
 import yj.board.domain.error.ErrorResponse;
-import yj.board.exception.*;
+import yj.board.exception.member.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -101,12 +100,6 @@ public class MemberExceptionHandler {
 
     private List<ErrorResponse.FieldError> getFieldErrors(BindingResult bindingResult) {
         List<FieldError> errors = bindingResult.getFieldErrors();
-        errors.stream()
-                .forEach(s -> {
-                    System.out.println(s.getField());
-                    System.out.println(s.toString());
-                });
-
 
         return errors.parallelStream()
                 .map(error -> ErrorResponse.FieldError.builder()

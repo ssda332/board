@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import yj.board.exception.CAccessDeniedException;
-import yj.board.exception.CAuthenticationEntryPointException;
+import yj.board.exception.member.CAccessDeniedException;
+import yj.board.exception.member.CAuthenticationEntryPointException;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package yj.board.exception;
+package yj.board.exception.member;
 
 public class LoginFailException extends RuntimeException{
     public LoginFailException() {

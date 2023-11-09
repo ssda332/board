@@ -1,14 +1,11 @@
-package yj.board.controller.board;
+package yj.board.controller.article;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import yj.board.domain.board.dto.ArticleDto;
-import yj.board.domain.board.dto.CategoryDto;
-import yj.board.domain.member.dto.MemberDto;
 import yj.board.service.BoardService;
 
 import java.util.List;
@@ -17,7 +14,7 @@ import java.util.List;
 @Controller
 @RequestMapping("{seq}")
 @RequiredArgsConstructor
-public class BoardController {
+public class ArticleController {
 
     private final BoardService boardService;
 
@@ -62,6 +59,7 @@ public class BoardController {
     public String deleteArticle(@PathVariable long seq, @PathVariable long atcSeq) {
         return "members/writeArticle";
     }
+
 
 /*    @PostMapping("/{seq}")
     public ResponseEntity<MemberDto> signup() {

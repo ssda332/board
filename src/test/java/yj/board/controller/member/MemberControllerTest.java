@@ -1,45 +1,22 @@
 package yj.board.controller.member;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.result.JsonPathResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
-import yj.board.config.WebSecurityConfig;
-import yj.board.domain.member.Authority;
-import yj.board.domain.member.Member;
 import yj.board.domain.member.dto.AuthorityDto;
-import yj.board.domain.member.dto.LoginDto;
 import yj.board.domain.member.dto.MemberDto;
-import yj.board.exception.DuplicateMemberException;
-import yj.board.jwt.JwtAccessDeniedHandler;
-import yj.board.jwt.JwtAuthenticationEntryPoint;
-import yj.board.jwt.TokenProvider;
-import yj.board.oauth2.MyAuthenticationSuccessHandler;
-import yj.board.repository.MemberRepository;
-import yj.board.service.CustomOAuth2UserService;
+import yj.board.exception.member.DuplicateMemberException;
 import yj.board.service.MemberService;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 

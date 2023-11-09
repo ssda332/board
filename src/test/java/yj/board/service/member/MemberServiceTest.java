@@ -1,6 +1,5 @@
 package yj.board.service.member;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,8 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import yj.board.domain.member.Authority;
 import yj.board.domain.member.Member;
 import yj.board.domain.member.dto.MemberDto;
-import yj.board.domain.member.dto.MemberUpdateDto;
-import yj.board.exception.DuplicateMemberException;
+import yj.board.exception.member.DuplicateMemberException;
 import yj.board.repository.MemberRepository;
 import yj.board.service.MemberService;
 

@@ -6,16 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import yj.board.domain.board.dto.CategoryDto;
+import yj.board.domain.board.dto.CategoryEditDto;
 import yj.board.service.CategoryService;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Controller
@@ -32,9 +34,22 @@ public class CategoryController {
         return "board/editCategory";
     }
 
-    // 모든 카테고리 조회
+    // 사이드바 모든 카테고리 조회
     @GetMapping("list")
     public ResponseEntity<ArrayList<CategoryDto>> findAll() {
         return ResponseEntity.ok(categoryService.findAll());
     }
+
+    // 카테고리 편집창에서 모든 카테고리 조회
+    @PostMapping("list")
+    public ResponseEntity<ArrayList<CategoryEditDto>> findEditedAll() {
+        return ResponseEntity.ok(categoryService.findAll_edit());
+    }
+
+    // 카테고리 편집내용 저장
+    @PutMapping("list")
+    public ResponseEntity<ArrayList<CategoryEditDto>> saveCategory(@RequestBody List<CategoryEditDto> data) {
+        return ResponseEntity.ok(categoryService.saveCategory(data));
+    }
+
 }
