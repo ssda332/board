@@ -1,4 +1,6 @@
-// 레이아웃 카테고리 렌더링
+/**
+ *  레이아웃 카테고리 렌더링
+ */
 function category_hireachy(categoryList) {
     // JSON 데이터 반복
     let html = "";
@@ -28,13 +30,13 @@ function category_hireachy(categoryList) {
                 html += '<div class="bg-white py-2 collapse-inner rounded">';
 
                 childCategories.forEach(function(childCategory) {
-                    html += '<a class="collapse-item" href="/' + childCategory.ctgId + '">' + childCategory.ctgTitle + '</a>';
+                    html += '<a class="collapse-item" href="/article?category=' + childCategory.ctgId + '">' + childCategory.ctgTitle + '</a>';
                 });
 
                 html += '</div></div></li>';
             } else {
                 html += '<li class="nav-item">';
-                html += '<a class="nav-link" href="/' + category.ctgId + '">';
+                html += '<a class="nav-link" href="/article?category=' + category.ctgId + '">';
                 html += '<i class="fas fa-fw fa-table"></i>';
                 html += '<span>' + category.ctgTitle + '</span></a></li>';
             }
@@ -45,6 +47,9 @@ function category_hireachy(categoryList) {
     return html;
 }
 
+/**
+ *  카테고리 편집기 렌더링 
+ */
 function renderEditCategory(data, ulElement) {
     ulElement.innerHTML = ''; // ul 비우기
 
@@ -439,4 +444,17 @@ function insertNewCategory(ulElement) {
         // ul에 새로운 li 요소 추가
         ulElement.appendChild(newLi);
     }
+}
+
+/**
+ * 게시글 작성 가능한 카테고리 렌더링
+ */
+function category_canWrite(categoryList) {
+    // JSON 데이터 반복
+    let html = "";
+    categoryList.forEach(function(category) {
+        html += '<option value="' + category.ctgId + '">' + category.ctgTitle + '</option>';
+    });
+
+    return html;
 }

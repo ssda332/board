@@ -1,4 +1,4 @@
-package yj.board.domain.board.dto;
+package yj.board.domain.article.dto;
 
 import lombok.*;
 

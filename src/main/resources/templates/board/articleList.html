@@ -5,8 +5,81 @@
 </head>
 <body>
 <section class="container-fluid">
-    <p style="color: black">게시판</p>
-    <div>메인 페이지 포함 내용</div>
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="h3 mb-2 text-gray-800">게시판</h1>
+        <button type="button" class="btn btn-primary" onclick="redirectToNewArticle()">글쓰기</button>
+    </div>
+    <hr>
+
+    <div class="row">
+
+        <div class="list-group col-md-12">
+            <div th:each="article : ${list}">
+                <a th:href="'/article/' + ${article.atcNum}" class="list-group-item list-group-item-action" style="min-height: 100px;">
+                    <div class="d-flex w-100 justify-content-between">
+                        <p class="mb-1 text-muted" style="max-width: 30px; margin: 0; display: flex; align-items: center;">
+                            <img class="img-profile rounded-circle" src="/img/undraw_profile.svg">
+                            <!-- atcWriter 매핑 -->
+                            <span class="mr-2 text-gray-600 small" style="white-space: nowrap;" th:text="${article.atcWriter}"></span>
+                        </p>
+                        <!-- atcRegDate 매핑 -->
+                        <small class="text-muted" th:text="${article.atcRegDate}"></small>
+                    </div>
+                    <!-- atcTitle 매핑 -->
+                    <h5 class="mb-1" style="margin-top: 5px;" th:text="${article.atcTitle}"></h5>
+                </a>
+            </div>
+            <!--<a href="#" class="list-group-item list-group-item-action" style="min-height: 100px;">
+                <div class="d-flex w-100 justify-content-between">
+                    <p class="mb-1 text-muted" style="max-width: 30px; margin: 0; display: flex; align-items: center;">
+                        <img class="img-profile rounded-circle" src="/img/undraw_profile.svg">
+                        <span class="mr-2 text-gray-600 small" style="white-space: nowrap;">atcWriter</span>
+                    </p>
+                    <small class="text-muted">atcRegDate</small>
+                </div>
+
+                <h5 class="mb-1" style="margin-top: 5px;">atcTitle</h5>
+            </a>-->
+        </div>
+
+        <div class="col-md-6 mx-auto">
+
+            <nav aria-label="Page navigation example" class="text-center">
+                <div class="col-md-9 mx-auto text-center" style="margin-top: 10px;">
+                    <ul class="pagination"
+                        style="justify-content: center;">
+                        <!-- Previous 버튼 -->
+                        <li class="page-item text-center" th:class="${pi.startPage == 1} ? 'page-item disabled' : 'page-item'">
+                            <a class="page-link" th:href="@{'/article?category=' + ${category} + '&page=' + ${pi.startPage - 1}}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <!-- 페이지 수를 동적으로 생성 -->
+                        <li th:each="pageNum : ${#numbers.sequence(pi.startPage, pi.endPage)}"
+                            th:class="${pi.currentPage == pageNum} ? 'page-item active' : 'page-item'">
+                            <a class="page-link" th:href="@{'/article?category=' + ${category} + '&page=' + ${pageNum}}" th:text="${pageNum}"></a>
+                        </li>
+
+                        <!-- Next 버튼 -->
+                        <li class="page-item" th:class="${pi.endPage == pi.maxPage} ? 'page-item disabled' : 'page-item'">
+                            <a class="page-link" th:href="@{'/article?category=' + ${category} + '&page=' + ${pi.endPage + 1}}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+        </div>
+
+    </div>
+
+    <script>
+        function redirectToNewArticle() {
+            window.location.href = '/article/new?category=' + [[${category}]];
+        }
+    </script>
 </section>
 </body>
 </html>

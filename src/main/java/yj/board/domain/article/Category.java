@@ -1,4 +1,4 @@
-package yj.board.domain.board;
+package yj.board.domain.article;
 
 
 import lombok.*;

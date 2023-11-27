@@ -5,12 +5,6 @@ function ajaxJson(type, url, data, isToken, callbackSuccess, callbackError) {
         url: url,
         contentType: 'application/json; charset=utf-8',
         data: data,
-        beforeSend: function (xhr) {
-            if (isToken) {
-                xhr.setRequestHeader("Content-type","application/json");
-                xhr.setRequestHeader("Authorization", localStorage.getItem("Authorization"));
-            }
-        },
     }).done(function(data, status, xhr) {
         callbackSuccess(data, status, xhr);
     }).fail(function(xhr, status, error) {
@@ -114,21 +108,24 @@ function logout() {
     window.location.href="/";
 }
 
-function isTokenValid() {
-    const accessToken = localStorage.getItem("Authorization"); // accessToken 가져오기
-    if (!accessToken) {
+/**
+ * 토큰 디코딩
+ * return : payload
+ */
+function decodeToken(tokenName) {
+    const token = localStorage.getItem(tokenName); // accessToken 가져오기
+    if (!token) {
         // accessToken이 없으면 유효하지 않다고 처리
-        return false;
+        return null;
     }
 
-    // accessToken을 디코딩하여 만료 시간(expiration time) 가져오기
-    const tokenParts = accessToken.split(".");
-    if (tokenParts.length !== 3) {
-        // 올바른 JWT 형식이 아니면 유효하지 않다고 처리
-        return false;
-    }
+    const payload = new jwt_decode(token);
 
-    const payload = JSON.parse(atob(tokenParts[1]));
+    return payload;
+}
+
+function isTokenValid() {
+    const payload = decodeToken("Authorization");
     const exp = payload.exp;
 
     if (!exp || typeof exp !== "number") {

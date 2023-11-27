@@ -62,7 +62,8 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
 //        request.setAttribute("oauth2test", "oauth2test");
         response.addCookie(accessToken);
         response.addCookie(refreshToken);*/
-
+//        response.setHeader("Authorization", tokenDto.getAccessToken());
+//        response.setHeader("refreshToken", tokenDto.getRefreshToken());
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
 
     }

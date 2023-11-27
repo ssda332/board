@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="yj.board.repository.mybatis.mapper.CommentMapper">
+
+    <select id="findComment" resultType="CommentDto">
+        SELECT              A.CMT_NUM, A.CMT_CONTENT, A.CMT_HIERACHY, A.CMT_ACTIVATED, A.CMT_REG_DATE, A.CMT_UPT_DATE, A.ATC_NUM, A.CMT_PRT_NUM, B.MEM_NICKNAME, A.MEM_ID
+        FROM                TB_COMMENT A, TB_MEM B
+        WHERE               A.MEM_ID = B.MEM_ID
+        AND                 A.CMT_ACTIVATED = 0
+        AND                 A.ATC_NUM = #{atcNum}
+        START WITH          A.CMT_PRT_NUM is null
+        CONNECT BY PRIOR    A.CMT_NUM = A.CMT_PRT_NUM
+        ORDER SIBLINGS by   A.CMT_NUM
+    </select>
+
+    <!--<insert id="insertComment">-->
+    <insert id="insertComment">
+        INSERT INTO TB_COMMENT (CMT_NUM, CMT_CONTENT, CMT_HIERACHY, CMT_ACTIVATED, CMT_REG_DATE, CMT_UPT_DATE, ATC_NUM, CMT_PRT_NUM, MEM_ID)
+        VALUES (CMT_NUM_SEQ.NEXTVAL, #{cmtContent}, #{cmtHierachy}, 0, SYSDATE, SYSDATE, #{atcNum}, #{cmtPrtNum}, #{memId})
+    </insert>
+
+</mapper>

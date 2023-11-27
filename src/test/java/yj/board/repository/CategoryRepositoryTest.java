@@ -6,11 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import yj.board.domain.board.dto.CategoryDto;
-import yj.board.domain.board.dto.CategoryEditDto;
+import yj.board.domain.article.dto.CategoryDto;
+import yj.board.domain.article.dto.CategoryEditDto;
 import yj.board.repository.mybatis.mapper.CategoryMapper;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 

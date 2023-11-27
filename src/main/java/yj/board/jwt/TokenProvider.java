@@ -37,6 +37,7 @@ public class TokenProvider {
 
         String accessToken = JWT.create()
                 .withSubject(memberInfoDto.getLoginId())
+                .withClaim("nickname", memberInfoDto.getNickname())
                 .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 

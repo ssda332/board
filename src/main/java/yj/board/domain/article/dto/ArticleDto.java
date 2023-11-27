@@ -1,4 +1,4 @@
-package yj.board.domain.board.dto;
+package yj.board.domain.article.dto;
 
 import lombok.*;
 
@@ -19,10 +19,11 @@ public class ArticleDto {
     ATC_REG_DATE
     ATC_UPT_DATE
     */
-    private long atcNun;
+    private String atcNum;
     private String atcTitle;
     private String atcContent;
     private String atcWriter;
     private String atcRegDate;
     private String atcUptDate;
+    private String ctgId;
 }

@@ -1,7 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="yj.board.repository.mybatis.ArticleMapper">
+<mapper namespace="yj.board.repository.mybatis.mapper.ArticleMapper">
+    <select id="findAll" resultType="CategoryDto">
+        SELECT ATC_NUM, ATC_TITLE, ATC_CONTENT, ATC_WRITER, ATC_ACTIVATED, CTG_ID, ATC_REG_DATE, ATC_UPT_DATE
+        FROM TB_ARTICLE
+    </select>
 
+    <select id="selectArticleCount" parameterType="String" resultType="java.lang.Integer">
+        SELECT  COUNT(*)
+        FROM    TB_ARTICLE A, TB_ARTICLE_CTG B
+        WHERE   1=1
+          AND     A.CTG_ID = B.CTG_ID
+          AND     B.CTG_ID = #{category}
+    </select>
+
+    <select id="findOne" resultType="yj.board.domain.article.dto.ArticleDto">
+        SELECT  A.ATC_NUM, A.ATC_TITLE, A.ATC_CONTENT, B.MEM_NICKNAME ATC_WRITER, A.ATC_ACTIVATED, C.CTG_TITLE CTG_ID, A.ATC_REG_DATE, A.ATC_UPT_DATE
+        FROM    TB_ARTICLE A, TB_MEM B, TB_ARTICLE_CTG C
+        WHERE   1=1
+          AND   A.ATC_WRITER = B.MEM_ID
+          AND   A.CTG_ID = C.CTG_ID
+          AND   A.ATC_NUM = #{atcNum}
+    </select>
+
+    <!-- resultMap 설정 -->
+    <resultMap id="articleResultMap" type="yj.board.domain.article.dto.ArticleDto">
+        <id property="atcNum" column="ATC_NUM"/>
+        <result property="atcTitle" column="ATC_TITLE"/>
+        <result property="atcContent" column="ATC_CONTENT"/>
+        <result property="atcWriter" column="ATC_WRITER"/>
+        <result property="atcRegDate" column="ATC_REG_DATE"/>
+        <result property="atcUptDate" column="ATC_UPT_DATE"/>
+    </resultMap>
+
+    <select id="selectArticleList" resultMap="articleResultMap">
+        SELECT   TO_NUMBER(A.ATC_NUM) ATC_NUM, A.ATC_TITLE, A.ATC_CONTENT, C.MEM_NICKNAME ATC_WRITER, TO_CHAR(A.ATC_REG_DATE, 'YYYY-MM-DD HH24:MI:SS') AS ATC_REG_DATE,
+                 TO_CHAR(A.ATC_UPT_DATE, 'YYYY-MM-DD HH24:MI:SS') AS ATC_UPT_DATE
+        FROM     TB_ARTICLE A, TB_ARTICLE_CTG B, (SELECT    MEM_ID, MEM_NICKNAME
+                                                  FROM      TB_MEM) C
+        WHERE    1=1
+        AND      A.CTG_ID = B.CTG_ID
+        AND      A.ATC_WRITER = C.MEM_ID
+        AND      B.CTG_ID = #{category}
+        ORDER BY ATC_NUM DESC
+    </select>
+
+    <select id="selectNewAtcNum" resultType="java.lang.Long">
+        SELECT ATC_NUM_SEQ.NEXTVAL
+        FROM DUAL
+    </select>
+
+    <insert id="insertArticle">
+        INSERT INTO TB_ARTICLE (ATC_NUM, ATC_TITLE, ATC_CONTENT, ATC_WRITER, ATC_ACTIVATED, CTG_ID, ATC_REG_DATE, ATC_UPT_DATE)
+        VALUES (#{atcNum}, #{atcTitle}, #{atcContent}, #{atcWriter}, 0, #{ctgId}, SYSDATE, SYSDATE)
+    </insert>
 
 </mapper>

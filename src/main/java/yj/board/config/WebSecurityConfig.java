@@ -17,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 import yj.board.jwt.*;
 import yj.board.jwt.JwtFilter;
 import yj.board.oauth2.MyAuthenticationSuccessHandler;
@@ -35,6 +36,7 @@ public class WebSecurityConfig {
     // OAuth2 Service
     private final CustomOAuth2UserService customOAuth2UserService;
     private final MyAuthenticationSuccessHandler myAuthenticationSuccessHandler;
+    private final CorsFilter corsFilter;
 
 /*    @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -60,6 +62,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin().disable()
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

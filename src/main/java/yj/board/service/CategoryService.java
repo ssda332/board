@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import yj.board.domain.board.dto.CategoryDto;
-import yj.board.domain.board.dto.CategoryEditDto;
+import yj.board.domain.article.dto.CategoryDto;
+import yj.board.domain.article.dto.CategoryEditDto;
 import yj.board.repository.CategoryRepository;
 
 import java.util.*;
@@ -22,8 +22,16 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public ArrayList<CategoryDto> findAll() {
-        return categoryRepository.findAll();
+    public ArrayList<CategoryDto> findCategory(int type) {
+
+        if (type == 1) {
+            return categoryRepository.findAll();
+        } else if (type == 2) {
+            return categoryRepository.findCanWrite();
+        } else {
+            return categoryRepository.findAll();
+        }
+
     }
 
     @Transactional(readOnly = true)

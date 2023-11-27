@@ -2,14 +2,13 @@ package yj.board.repository.mybatis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import yj.board.domain.board.Category;
-import yj.board.domain.board.dto.CategoryDto;
-import yj.board.domain.board.dto.CategoryEditDto;
+import yj.board.domain.article.Category;
+import yj.board.domain.article.dto.CategoryDto;
+import yj.board.domain.article.dto.CategoryEditDto;
 import yj.board.repository.CategoryRepository;
 import yj.board.repository.mybatis.mapper.CategoryMapper;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,6 +24,11 @@ public class MyBatisCategoryRepository implements CategoryRepository {
     @Override
     public ArrayList<CategoryDto> findAll() {
         return categoryMapper.findAll();
+    }
+
+    @Override
+    public ArrayList<CategoryDto> findCanWrite() {
+        return categoryMapper.findCanWrite();
     }
 
     @Override

@@ -11,6 +11,16 @@
         ORDER SIBLINGS by CTG_SORT
     </select>
 
+    <select id="findCanWrite" resultType="CategoryDto">
+        SELECT CTG_ID, CTG_TITLE, CTG_HIERACHY, CTG_SORT, CTG_PRT_ID
+        FROM TB_ARTICLE_CTG
+        WHERE CTG_ACTIVATED = 0
+          AND CTG_ID NOT IN (SELECT DISTINCT CTG_PRT_ID FROM TB_ARTICLE_CTG WHERE CTG_PRT_ID IS NOT NULL)
+        START WITH CTG_PRT_ID IS NULL
+        CONNECT BY PRIOR CTG_ID = CTG_PRT_ID
+        ORDER SIBLINGS BY CTG_SORT
+    </select>
+
     <select id="findAll_edit" resultType="CategoryEditDto">
         SELECT CTG_ID, CTG_TITLE, CTG_HIERACHY, CTG_SORT, CTG_PRT_ID,
                (SELECT CTG_TITLE
@@ -47,6 +57,5 @@
         set     CTG_ACTIVATED=1
         where   CTG_ID = #{ctgId}
     </update>
-
 
 </mapper>

@@ -1,0 +1,77 @@
+<html th:replace="~{fragments/layout :: layout(~{::title},~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>board</title>
+</head>
+<style>
+    .action-buttons {
+        display: flex;
+        gap: 10px; /* a 태그 사이의 간격을 조절합니다. */
+    }
+
+    .list-group-item.active {
+        background-color: darkblue;
+        color: white;
+    }
+</style>
+<body>
+    <section class="container-fluid">
+
+        <!-- 내용 부분 -->
+
+        <div class="card border-light mb-3">
+            <div th:text="${article.ctgId}" class="card-header">Stream</div>
+            <div class="card-body" style="padding-bottom: 100px;">
+                <p class="mb-1 text-muted" style="max-width: 30px; margin: 0; display: flex; align-items: center;">
+                    <img class="img-profile rounded-circle" src="/img/undraw_profile.svg">
+                    <!-- atcWriter 매핑 -->
+                    <span th:text="${article.atcWriter}" class="mr-2 text-gray-700" style="white-space: nowrap; margin: 0px 10px 0px 5px;">유저1</span>
+                </p>
+                <h3 th:text="${article.atcTitle}" class="card-title" style="margin-bottom: 30px; margin-top: 20px;"><b>안녕하세요 반갑습니다 잘부탁드립니다</b></h3>
+                <p th:utext="${article.atcContent}" class="card-text">안녕하세요 감사해요 잘있어요 다시만나요<br>안녕하세요 감사해요 잘있어요 다시만나요</p>
+            </div>
+        </div>
+
+        <!-- 댓글 부분 -->
+        <div id="commentDiv">
+
+        </div>
+
+        <div class="input-group" style="margin-top: 10px;">
+            <textarea id="writeCommentArea" class="form-control"></textarea>
+            <div class="input-group-append">
+                <button id="submitButton" class="btn btn-outline-secondary" type="button">작성</button>
+            </div>
+        </div>
+
+        <script src="/vendor/jquery/jquery.min.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/js/common_hierachy.js"></script>
+        <script src="/js/common_hierachy_comment.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jwt-decode-module@1.0.4/build/jwt-decode.min.js"></script>
+
+        <script th:inline="javascript">
+            ajaxJson("GET", "/comment", {atcNum: [[${article.atcNum}]]}, false,
+                function(data, status, xhr) {
+                    renderComment(data);
+                },
+                function(xhr, status, error) {
+                    console.log("실패");
+                }
+            );
+
+            // 댓글 작성
+            document.getElementById('submitButton').addEventListener('click', function() {
+                submitReply({
+                    cmtPrtNum: '',
+                    cmtContent: document.getElementById('writeCommentArea').value,
+                    cmtHierachy: 1,
+                    atcNum: [[${article.atcNum}]],
+                    memId: ''
+                });
+
+                document.getElementById('writeCommentArea').value = '';
+            });
+        </script>
+    </section>
+</body>
+</html>

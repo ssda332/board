@@ -41,13 +41,13 @@
         </div>
     </div>
 
+    <script src="/vendor/jquery/jquery.min.js"></script>
     <script src="/js/common.js"></script>
     <script th:inline="javascript">
         const inputTitleElement = document.getElementById("input_title"); // input 태그 가져오기
         const ulElement = document.getElementById("category_box");
         let clickedLi = null;
 
-        // 권한 검색
         tokenToJson("POST", "/category/list", null, true,
             function(data, status, xhr) {
                 renderEditCategory(data, ulElement);
