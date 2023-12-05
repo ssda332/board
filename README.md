@@ -9,6 +9,9 @@
 - SpringBoot Security
 - Spring Data JPA
 - Mybatis
+- Thymeleaf
+- Javascript
+- Jquery
 
 ### DB
 - Oracle
@@ -22,23 +25,20 @@
 
 * * *
 ## 기능
-- 회원가입, 로그인, OAuth2 로그인(google)
+- 회원가입, 로그인, OAuth2 로그인(google), 마이페이지
 - 관리자 메뉴(유저, 카테고리, 게시글, 댓글)
 - 게시판, 댓글 CRUD(글 열람, 글쓰기, 댓글달기)
-- 
 
 * * *
 ## WAS 아키텍처
 
-(사진)
-WAS와 DB 서버만을 둔 MPA 방식의 구조로 설계하였습니다. 추후 클라이언트 서버를 따로 둘 것을 염두하여
-REST API 통신 방식으로 설계하였습니다.
+![SYSTEM ARCHITECTURE drawio](https://github.com/ssda332/board/assets/82029665/2f7f6a8f-2828-4ca1-8ba9-e5fb34df1b85)
+- WAS와 DB 서버만을 둔 MPA 방식의 구조로 설계하였습니다. 
+- 추후 클라우드 환경 구축까지 고려하였습니다.
+
 
 * * *
 ## ERD
-(사진)
-
-* * *
-## 시퀀스 다이어그램
+![2023](https://github.com/ssda332/board/assets/82029665/2978302b-703a-4ea3-b724-dcabf3b9132d)
 
 
