@@ -56,6 +56,13 @@ dependencies {
 
 	// 정적 리소스 반영
 	implementation 'org.springframework.boot:spring-boot-devtools'
+
+	// aws
+	implementation 'io.awspring.cloud:spring-cloud-aws-context:2.4.4'
+
+	// markdown to html
+	implementation 'org.commonmark:commonmark:0.20.0'
+	implementation 'org.commonmark:commonmark-ext-gfm-tables:0.20.0'
 }
 
 

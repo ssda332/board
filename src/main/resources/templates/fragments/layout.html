@@ -667,7 +667,7 @@
     <script src="/js/common.js"></script>
     <script src="/js/common_hierachy.js"></script>
     <script th:inline="javascript">
-        var memberDto;
+
         $(document).ready(function() {
             // 버튼 클릭 이벤트 핸들러
             $('#logoutBtn').click(function() {
@@ -696,10 +696,9 @@
         // 권한 검색
         tokenToJson("GET", "/members/member", null, true,
             function(data, status, xhr) {
-                // alert("ok");
                 console.log("/members/member");
-                console.log(data);
-                window.memberDto = data;
+                console.log(data.authorityDtoSet);
+                //var authorityDtoSet = data.authorityDtoSet;
                 // ADMIN 권한일때
                 if (hasRoleAdmin(data.authorityDtoSet)) {
                     addAdminMenu();
@@ -709,11 +708,6 @@
                 let refreshToken = localStorage.getItem("refreshToken");
                 let payload = JSON.parse(atob(accessToken.split(".")[1]));
                 let refPayload = JSON.parse(atob(refreshToken.split(".")[1]));
-
-                console.log("payload");
-                console.log(payload);
-                console.log("refPayload");
-                console.log(refPayload);
 
                 // member_mypage - mypage tag id
                 /*let myPageLinkTag = document.getElementById('member_mypage');

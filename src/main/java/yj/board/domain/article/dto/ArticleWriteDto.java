@@ -14,4 +14,5 @@ public class ArticleWriteDto {
     private String atcContent;
     private String atcWriter;
     private String ctgId;
+    private String[] tempFiles;
 }

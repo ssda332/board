@@ -3,6 +3,7 @@ package yj.board.repository.mybatis;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Repository;
+import yj.board.domain.article.dto.ArticleDetailDto;
 import yj.board.domain.article.dto.ArticleDto;
 import yj.board.domain.article.dto.ArticleWriteDto;
 import yj.board.repository.ArticleRepository;
@@ -49,7 +50,17 @@ public class MyBatisArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public ArticleDto findArticle(String atcNum) {
+    public void updateArticle(ArticleWriteDto articleDto) {
+        articleMapper.updateArticle(articleDto);
+    }
+
+    @Override
+    public ArticleDetailDto findArticle(String atcNum) {
         return articleMapper.findOne(atcNum);
+    }
+
+    @Override
+    public void deleteArticle(String atcNum) {
+        articleMapper.deleteArticle(atcNum);
     }
 }

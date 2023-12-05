@@ -1,6 +1,7 @@
 package yj.board.repository;
 
 import org.apache.ibatis.session.RowBounds;
+import yj.board.domain.article.dto.ArticleDetailDto;
 import yj.board.domain.article.dto.ArticleDto;
 import yj.board.domain.article.dto.ArticleWriteDto;
 
@@ -14,6 +15,8 @@ public interface ArticleRepository {
     ArrayList<ArticleDto> selectArticleList(RowBounds rowBounds, String category);
     Long selectNewAtcNum();
     void writeArticle(ArticleWriteDto articleDto);
-    ArticleDto findArticle(String atcNum);
+    void updateArticle(ArticleWriteDto articleDto);
+    ArticleDetailDto findArticle(String atcNum);
+    void deleteArticle(String atcNum);
 
 }

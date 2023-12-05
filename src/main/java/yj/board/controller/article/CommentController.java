@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import yj.board.domain.article.dto.CategoryDto;
 import yj.board.domain.comment.dto.CommentDto;
+import yj.board.domain.comment.dto.CommentUpdateDto;
 import yj.board.domain.comment.dto.CommentWriteDto;
 import yj.board.service.CommentService;
 
@@ -26,7 +27,7 @@ public class CommentController {
         return ResponseEntity.ok(commentService.findComment(atcNum));
     }
 
-    // 댓글 달기
+    // 댓글 달기 & 답글 달기
     @PostMapping("")
     public ResponseEntity<ArrayList<CommentDto>> insertComment(@RequestBody CommentWriteDto comment) {
 
@@ -38,21 +39,16 @@ public class CommentController {
 
     // 댓글 수정
     @PutMapping("")
-    public ResponseEntity<CommentDto> updateComment(@RequestParam String atcNum) {
+    public ResponseEntity<CommentDto> updateComment(@RequestBody CommentUpdateDto comment) {
+        commentService.updateComment(comment);
         return ResponseEntity.ok(null);
     }
 
     // 댓글 삭제
     @DeleteMapping("")
-    public ResponseEntity<CommentDto> deleteComment(@RequestParam String atcNum) {
+    public ResponseEntity<CommentDto> deleteComment(@RequestParam String cmtNum) {
+        commentService.deleteComment(cmtNum);
         return ResponseEntity.ok(null);
     }
-
-    // 답글 달기
-    @PostMapping("{cmtNum}")
-    public ResponseEntity<CommentDto> insertReply(@RequestParam String atcNum, @PathVariable String cmtNum) {
-        return ResponseEntity.ok(null);
-    }
-
 
 }

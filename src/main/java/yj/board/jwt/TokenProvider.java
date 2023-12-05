@@ -38,6 +38,7 @@ public class TokenProvider {
         String accessToken = JWT.create()
                 .withSubject(memberInfoDto.getLoginId())
                 .withClaim("nickname", memberInfoDto.getNickname())
+                .withClaim("memId", memberInfoDto.getId())
                 .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
@@ -122,5 +123,12 @@ public class TokenProvider {
             log.error("토큰 검증 실패");
         }
         return false;
+    }
+
+    public String getMemberPk(String bearerToken) {
+        String token = resolveToken(bearerToken);
+        String memId = decodedJWT(token).getClaim("memId").toString();
+
+        return memId;
     }
 }

@@ -2,6 +2,7 @@ package yj.board.repository.mybatis.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.RowBounds;
+import yj.board.domain.article.dto.ArticleDetailDto;
 import yj.board.domain.article.dto.ArticleDto;
 import yj.board.domain.article.dto.ArticleWriteDto;
 
@@ -15,6 +16,7 @@ public interface ArticleMapper {
     ArrayList<ArticleDto> selectArticleList(RowBounds rowBounds, String category);
     Long selectNewAtcNum();
     void insertArticle(ArticleWriteDto articleDto);
-    ArticleDto findOne(String atcNum);
-
+    void updateArticle(ArticleWriteDto articleDto);
+    ArticleDetailDto findOne(String atcNum);
+    void deleteArticle(String atcNum);
 }

@@ -14,10 +14,27 @@
         ORDER SIBLINGS by   A.CMT_NUM
     </select>
 
-    <!--<insert id="insertComment">-->
     <insert id="insertComment">
         INSERT INTO TB_COMMENT (CMT_NUM, CMT_CONTENT, CMT_HIERACHY, CMT_ACTIVATED, CMT_REG_DATE, CMT_UPT_DATE, ATC_NUM, CMT_PRT_NUM, MEM_ID)
         VALUES (CMT_NUM_SEQ.NEXTVAL, #{cmtContent}, #{cmtHierachy}, 0, SYSDATE, SYSDATE, #{atcNum}, #{cmtPrtNum}, #{memId})
     </insert>
+
+    <update id="deleteCommentByArticle">
+        UPDATE TB_COMMENT
+        SET CMT_ACTIVATED = 1
+        WHERE ATC_NUM = #{atcNum}
+    </update>
+
+    <update id="updateComment">
+        UPDATE TB_COMMENT
+        SET CMT_CONTENT = #{cmtContent}
+        WHERE CMT_NUM = #{cmtNum}
+    </update>
+
+    <update id="deleteComment">
+        UPDATE TB_COMMENT
+        SET CMT_ACTIVATED = 1
+        WHERE CMT_NUM = #{cmtNum}
+    </update>
 
 </mapper>

@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ArticleDto {
+public class ArticleDetailDto {
     /*
     ATC_NUM
     ATC_TITLE
@@ -27,4 +27,5 @@ public class ArticleDto {
     private String atcRegDate;
     private String atcUptDate;
     private String ctgId;
+    private String ctgTitle;
 }

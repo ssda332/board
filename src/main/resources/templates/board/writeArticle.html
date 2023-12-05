@@ -24,43 +24,94 @@
 
         <div id="editor"></div>
         <button id="write" onclick="writeArticle()" type="button" class="btn btn-primary" style="margin-top: 10px">작성</button>
+        <button id="test" onclick="test()" type="button" class="btn btn-primary" style="margin-top: 10px">test</button>
 
         <!-- TOAST UI EDITOR JS-->
         <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
         <script src="/js/common.js"></script>
         <script src="/js/common_hierachy.js"></script>
         <script src="/vendor/jquery/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/jwt-decode-module@1.0.4/build/jwt-decode.min.js">
+        <script src="https://cdn.jsdelivr.net/npm/jwt-decode-module@1.0.4/build/jwt-decode.min.js"></script>
+
+        <script>
 
         </script>
         <script>
+            let tempFiles = [];
+
+            /*<![CDATA[*/
+            const articleContent = `[[${article.atcContent}]]`;
+            const articleTitle = '[[${article.atcTitle}]]';
+            const articleNum = '[[${article.atcNum}]]';
+            /*]]>*/
+            if (articleTitle != "") {
+                // 게시글 작성 & 게시글 수정
+                tokenToJson("PUT", "/article/" + articleNum, null, true,
+                    function(data, status, xhr) {
+                        console.log("글쓴이입니다.");
+                    },
+
+                    function(xhr, status, error) {
+                        console.log("글쓴이가 아닙니다");
+                        location.href = "/";
+                    }
+                );
+            }
+
+            document.getElementById("title").value = articleTitle;
+
             const editor = new toastui.Editor({
                 el: document.querySelector('#editor'),
                 previewStyle: 'vertical',
                 height: '500px',
-                initialValue: '내용을 적어주세요.',
+                initialValue: articleContent,
                 hooks: {
                     addImageBlobHook(blob, callback) {  // 이미지 업로드 로직 커스텀
                         console.log(blob);
                         console.log(callback);
+
+                        const formData = new FormData();
+                        formData.append('image', blob);
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/upload',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(data) {
+                                console.log('ajax 이미지 업로드 성공');
+                                console.log(data);
+
+                                tempFiles.push(data);
+
+                                // 뷰어에 이미지를 표시하려면 다음 코드를 사용할 수 있습니다.
+                                callback(data, "사진 대체 텍스트 입력");
+
+                            },
+                            error: function(e) {
+                                console.log('ajax 이미지 업로드 실패');
+                                console.log(e);
+
+                                // callback('image_load_fail', '사진 대체 텍스트 입력');
+                            }
+                        });
                     }
                 }
 
             });
 
             function writeArticle() {
-                const articleDto = {atcNum: '',
+                const articleDto = {atcNum: getQueryString("atcNum"),
                                     atcTitle: document.querySelector("#title").value,
-                                    atcContent: editor.getHTML(),
+                                    atcContent: editor.getMarkdown(),
                                     atcWriter: decodeToken("refreshToken").memId,
-                                    ctgId: document.querySelector("#selectCtg").value
+                                    ctgId: document.querySelector("#selectCtg").value,
+                                    tempFiles: tempFiles
                 };
 
-                console.log(articleDto);
-
-
-                // 권한 검색
-                tokenToJson("POST", "/article/new", JSON.stringify(articleDto), true,
+                // 게시글 작성 & 게시글 수정
+                tokenToJson("POST", "/article", JSON.stringify(articleDto), true,
                     function(data, status, xhr) {
                         console.log("게시글 작성 성공");
                         location.href="/article?category=" + document.querySelector("#selectCtg").value;
@@ -70,6 +121,28 @@
                         console.log("게시글 작성 실패");
                     }
                 );
+            }
+
+/*
+            function copyTempFiles(temp) {
+                tokenToJson("PUT", "/upload", JSON.stringify(tempFiles), true,
+                    function(data, status, xhr) {
+                        console.log("게시글 작성 성공 - 이미지 파일 완전저장 완료");
+                        location.href="/article?category=" + document.querySelector("#selectCtg").value;
+                    },
+
+                    function(xhr, status, error) {
+                        console.log("게시글 작성 실패");
+                    }
+                );
+            }
+*/
+
+            function test() {
+                // tempFiles 배열에 있는 모든 원소 정보 출력
+                tempFiles.forEach(function(file, index) {
+                    console.log(`Image ${index + 1}:`, file);
+                });
             }
 
             // 작성 가능한 카테고리 조회
@@ -82,8 +155,7 @@
                     document.getElementById('selectCtg').innerHTML += html;
 
                     // category 쿼리스트링 값을 가져오기 (예시: "?category=3")
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const categoryParam = urlParams.get('category');
+                    const categoryParam = getQueryString("category");
 
                     // category 쿼리스트링 값이 있다면 해당 값의 Option을 선택
                     if (categoryParam) {
@@ -101,6 +173,11 @@
                 }
             );
 
+            function getQueryString(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const categoryParam = urlParams.get(name);
+                return categoryParam;
+            }
 
         </script>
     </section>

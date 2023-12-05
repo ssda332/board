@@ -3,21 +3,27 @@
  */
 function generateCommentHtml(comments, parentId = null) {
     let html = '';
+    const payload = decodeToken("refreshToken");
 
     for (const comment of comments) {
         if (comment.cmtPrtNum === parentId) {
-            // console.log(comment);
+            const isCurrentUserComment = payload.memId == comment.memId;
+
             html += `
                 <li class="list-group-item">
                     <p class="mb-1 text-muted" style="max-width: 30px; margin: 0; display: flex; align-items: center;">
                         <img class="img-profile rounded-circle" src="/img/undraw_profile.svg">
                         <span class="mr-2 text-gray-700" style="white-space: nowrap; margin: 0px 10px 0px 5px;">${comment.memNickname}</span>
                         <div class="d-flex justify-content-between" style="width: 100%;">
-                            <div class="mr-2 text-gray-800" style="margin-top: 10px;">
+                            <div id="comment_${comment.cmtNum}" class="mr-2 text-gray-800 flex-grow-1" style="margin-top: 10px;">
                                 ${comment.cmtContent}<br>
                             </div>
                             <div class="mr-2 text-gray-800" style="white-space: nowrap; margin-top: 10px;">
-                                <button onclick="toggleReplyArea(${comment.cmtNum})" type="button" onclick="" class="btn btn-secondary btn-sm">답글</button>
+                                <button onclick="toggleReplyArea(${comment.cmtNum})" type="button" class="btn btn-secondary btn-sm">답글</button>
+                                ${isCurrentUserComment ? `
+                                    <button type="button" onclick="editComment(${comment.cmtNum})" class="btn btn-info btn-sm">수정</button>
+                                    <button type="button" onclick="deleteComment(${comment.cmtNum})" class="btn btn-danger btn-sm">삭제</button>
+                                ` : ''}
                             </div>
                         </div>
                     </p>
@@ -87,4 +93,33 @@ function renderComment(data) {
     let html = generateCommentHtml(data, null);
     const commentDiv = document.getElementById('commentDiv');
     commentDiv.innerHTML = html;
+}
+
+function editComment(cmtNum) {
+    // id가 "comment_" + cmtNum 인 태그를 찾아서
+    // 태그 안 text 그대로 유지한채 textarea 태그로 바꿔주는 코드
+    // 댓글의 내용을 가져오기
+    const commentText = document.getElementById(`comment_${cmtNum}`).innerText;
+
+    // 댓글 내용을 표시하는 태그를 textarea로 교체
+    const commentElement = document.getElementById(`comment_${cmtNum}`);
+    const textarea = document.createElement('textarea');
+    textarea.className = 'mr-2 text-gray-800 flex-grow-1';
+    textarea.style.marginTop = '10px';
+    textarea.value = commentText;
+
+    // 원래의 댓글을 숨기고 textarea를 표시
+    commentElement.style.display = 'none';
+    commentElement.after(textarea);
+
+    // textarea에 포커스 주기
+    textarea.focus();
+
+    // 편집 완료 시의 이벤트 처리 (예: 엔터 키를 누르면 저장)
+    textarea.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            saveEditedComment(cmtNum, textarea.value);
+        }
+    });
 }

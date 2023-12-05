@@ -116,7 +116,9 @@ function decodeToken(tokenName) {
     const token = localStorage.getItem(tokenName); // accessToken 가져오기
     if (!token) {
         // accessToken이 없으면 유효하지 않다고 처리
-        return null;
+        let anonymous = new Object();
+        anonymous.memId = -1;
+        return anonymous;
     }
 
     const payload = new jwt_decode(token);

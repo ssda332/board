@@ -48,34 +48,37 @@
 
         </div>
 
-        <div class="row">
-            <div class="card col-xl-12" style="max-width: 100%; max-height: 100%;"> <!-- border-success -->
-                <div class="card-header bg-transparent">내 정보</div> <!-- border-success -->
-                <div class="card-body"> <!-- text-success -->
-                    <p class="card-text">
-
-                        <div class="input-group mb-3 col-xl-5">
-                            <span class="input-group-text" id="basic-addon1">ID</span>
-                            <input type="text" class="form-control" placeholder="ID" aria-label="ID" aria-describedby="basic-addon1" disabled>
-                        </div>
-
-                        <div class="input-group mb-3 col-xl-5">
-                            <span class="input-group-text" id="basic-addon2">닉네임</span>
-                            <input type="text" class="form-control" placeholder="닉네임" aria-label="닉네임" aria-describedby="basic-addon2">
-                        </div>
-
-                        <div class="input-group mb-3 col-xl-5">
-                            <span class="input-group-text" id="basic-addon3">가입날짜</span>
-                            <input type="text" class="form-control" aria-label="가입날짜" aria-describedby="basic-addon3" disabled>
-                        </div>
-
-                    </p>
+        <div class="row" style="color: #2d2e33">
+            <div class="col-sm-12" style="display: flex; justify-content: center">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title text-black-80 font-weight-bold">내 정보</h5>
+                        <p class="card-text">
+                            <div class="form-group">
+                                <label for="memId">ID</label>
+                                <input type="input" class="form-control" id="memId" aria-describedby="emailHelp" value="유저1" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="memNickname">닉네임</label>
+                                <input type="input" class="form-control" id="memNickname" aria-describedby="emailHelp">
+                            </div>
+                            <div class="input-group mb-3" style="margin-top: 30px;">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroupFileAddon01">프로필 사진</span>
+                                </div>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">변경</button>
+                        </p>
+                        <a href="#" class="btn btn-primary">회원 탈퇴</a>
+                    </div>
                 </div>
-                <div class="card-footer bg-transparent">
-                    <button type="button" class="btn btn-primary">저장</button>
-                </div> <!-- border-success -->
             </div>
         </div>
+
     </section>
 
     <script>

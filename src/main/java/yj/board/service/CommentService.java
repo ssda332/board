@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import yj.board.domain.article.dto.CategoryDto;
 import yj.board.domain.comment.dto.CommentDto;
+import yj.board.domain.comment.dto.CommentUpdateDto;
 import yj.board.domain.comment.dto.CommentWriteDto;
 import yj.board.repository.ArticleRepository;
 import yj.board.repository.CommentRepository;
@@ -28,5 +29,13 @@ public class CommentService {
 
     public void insertComment(CommentWriteDto comment) {
         commentRepository.insertComment(comment);
+    }
+
+    public void deleteComment(String cmtNum) {
+        commentRepository.deleteComment(cmtNum);
+    }
+
+    public void updateComment(CommentUpdateDto comment) {
+        commentRepository.updateComment(comment);
     }
 }
