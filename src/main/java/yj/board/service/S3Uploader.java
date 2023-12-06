@@ -36,6 +36,9 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Value("${cloud.aws.s3.s3url}")
+    private String s3url;
+
     public String uploadFile(MultipartFile file){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-kk:mm:ss");
         String strDate = dateFormat.format(Calendar.getInstance().getTime());
@@ -64,7 +67,8 @@ public class S3Uploader {
 
         Arrays.stream(tempFiles)
                 .forEach(file -> {
-                    String orgKey = extractS3Key(file);
+                    log.debug("filename : " + file);
+                    String orgKey = extractS3Key(file, s3url);
                     String prefixToRemove = "temp/";
                     // "temp/" 부분을 없애기
                     String copyKey = orgKey.replace(prefixToRemove, "");
@@ -93,14 +97,15 @@ public class S3Uploader {
         return build;
     }
 
-    private static String extractS3Key(String s3ObjectUrl) {
+    private static String extractS3Key(String s3ObjectUrl, String s3url) {
         // URL에서 S3 버킷 이름 이후의 부분을 추출
-        String bucketName = "boardimagebucket.s3.ap-northeast-2.amazonaws.com/";
-        int index = s3ObjectUrl.indexOf(bucketName);
+//        String bucketName = "boardprojectbucket.s3.ap-northeast-2.amazonaws.com/";
+
+        int index = s3ObjectUrl.indexOf(s3url);
 
         if (index != -1) {
             // S3 버킷 이후의 부분을 추출하여 디코딩
-            String keyEncoded = s3ObjectUrl.substring(index + bucketName.length());
+            String keyEncoded = s3ObjectUrl.substring(index + s3url.length());
             return urlDecode(keyEncoded);
         }
 
