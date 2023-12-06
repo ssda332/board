@@ -56,7 +56,9 @@ DB에 Refresh Token을 저장해서 검증시 오직 하나의 Refresh Token만 
 
 ### 소셜 로그인 (Google)
 ![소셜 로그인 시퀀스](https://github.com/ssda332/board/assets/82029665/e5fe0cbb-04ff-4dd6-83e7-cd32c153f5a2)
-Google 서버와 통신하여 유저 정보를 가져오고, 
+
+Google 서버와 통신하여 유저 정보를 가져오고, 해당 정보와 토큰을 만들어 소셜 로그인을 구현하였습니다.
+
 
 
 ### 게시판 CRUD 기능 (계층형 댓글, 계층형 카테고리)
