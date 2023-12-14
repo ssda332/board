@@ -12,8 +12,10 @@ import java.util.ArrayList;
 public interface CommentMapper {
 
     ArrayList<CommentDto> findComment(String atcNum);
+    CommentDto findOne(String cmtNum);
     void insertComment(CommentWriteDto comment);
     void deleteCommentByArticle(String atcNum);
     void deleteComment(String cmtNum);
     void updateComment(CommentUpdateDto comment);
+
 }

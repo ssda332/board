@@ -23,6 +23,11 @@ public class MyBatisCommentRepository implements CommentRepository {
     }
 
     @Override
+    public CommentDto findOne(String cmtNum) {
+        return commentMapper.findOne(cmtNum);
+    }
+
+    @Override
     public void insertComment(CommentWriteDto comment) {
         commentMapper.insertComment(comment);
     }

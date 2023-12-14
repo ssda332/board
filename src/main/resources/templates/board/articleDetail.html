@@ -65,9 +65,6 @@
 
         <script th:inline="javascript">
             const content = [[${article.atcContent}]];
-            // marked.parse(content);
-
-
             const payload = decodeToken("refreshToken");
             const memId = [[${article.memId}]];
 

@@ -3,11 +3,14 @@ package yj.board.controller.article;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import yj.board.auth.PrincipalDetails;
 import yj.board.domain.article.dto.*;
 import yj.board.domain.file.FileDto;
 import yj.board.domain.token.dto.ReissueTokenDto;
@@ -17,6 +20,7 @@ import yj.board.service.ArticleService;
 import yj.board.service.S3Uploader;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,7 +86,7 @@ public class ArticleController {
     // 게시글 작성
     @Transactional
     @PostMapping("")
-    public ResponseEntity<ArticleWriteDto> writeArticle(@RequestBody ArticleWriteDto articleDto) {
+    public ResponseEntity<ArticleWriteDto> writeArticle(@RequestBody @Valid ArticleWriteDto articleDto) {
         articleService.writeArticle(articleDto);
         s3Uploader.copyFile(articleDto);
 

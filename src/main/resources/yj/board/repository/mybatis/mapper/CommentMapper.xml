@@ -14,6 +14,12 @@
         ORDER SIBLINGS by   A.CMT_NUM
     </select>
 
+    <select id="findOne" resultType="CommentDto">
+        SELECT              A.CMT_NUM, A.CMT_CONTENT, A.CMT_HIERACHY, A.CMT_ACTIVATED, A.CMT_REG_DATE, A.CMT_UPT_DATE, A.ATC_NUM, A.CMT_PRT_NUM, A.MEM_ID
+        FROM                TB_COMMENT A
+        WHERE               A.CMT_NUM = #{cmtNum}
+    </select>
+
     <insert id="insertComment">
         INSERT INTO TB_COMMENT (CMT_NUM, CMT_CONTENT, CMT_HIERACHY, CMT_ACTIVATED, CMT_REG_DATE, CMT_UPT_DATE, ATC_NUM, CMT_PRT_NUM, MEM_ID)
         VALUES (CMT_NUM_SEQ.NEXTVAL, #{cmtContent}, #{cmtHierachy}, 0, SYSDATE, SYSDATE, #{atcNum}, #{cmtPrtNum}, #{memId})

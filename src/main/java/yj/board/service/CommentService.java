@@ -27,6 +27,11 @@ public class CommentService {
         return commentRepository.findComment(atcNum);
     }
 
+    @Transactional(readOnly = true)
+    public CommentDto findOne(String cmtNum) {
+        return commentRepository.findOne(cmtNum);
+    }
+
     public void insertComment(CommentWriteDto comment) {
         commentRepository.insertComment(comment);
     }

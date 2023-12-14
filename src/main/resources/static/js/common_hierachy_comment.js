@@ -15,15 +15,37 @@ function generateCommentHtml(comments, parentId = null) {
                         <img class="img-profile rounded-circle" src="/img/undraw_profile.svg">
                         <span class="mr-2 text-gray-700" style="white-space: nowrap; margin: 0px 10px 0px 5px;">${comment.memNickname}</span>
                         <div class="d-flex justify-content-between" style="width: 100%;">
+                        
                             <div id="comment_${comment.cmtNum}" class="mr-2 text-gray-800 flex-grow-1" style="margin-top: 10px;">
                                 ${comment.cmtContent}<br>
                             </div>
+                            
+                            <div id="edit_${comment.cmtNum}" class="input-group" style="margin: 10px 0px 10px 0px; display: none;">
+                                <textarea id="editText_${comment.cmtNum}" class="form-control">${comment.cmtContent}</textarea>
+                                <div class="input-group-append">
+                                    <button onclick="editComment({
+                                                            cmtNum: ${comment.cmtNum},
+                                                            cmtContent: document.getElementById('editText_${comment.cmtNum}').value,
+                                                            atcNum: ${comment.atcNum},
+                                                            memId: ${comment.memId}
+                                                    })" class="btn btn-outline-secondary" type="button">작성
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            
                             <div class="mr-2 text-gray-800" style="white-space: nowrap; margin-top: 10px;">
                                 <button onclick="toggleReplyArea(${comment.cmtNum})" type="button" class="btn btn-secondary btn-sm">답글</button>
                                 ${isCurrentUserComment ? `
-                                    <button type="button" onclick="editComment(${comment.cmtNum})" class="btn btn-info btn-sm">수정</button>
-                                    <button type="button" onclick="deleteComment(${comment.cmtNum})" class="btn btn-danger btn-sm">삭제</button>
+                                    <button type="button" onclick="toggleEditComment(${comment.cmtNum})" class="btn btn-info btn-sm">수정</button>
+                                    <button type="button" onclick="deleteComment({
+                                                            cmtNum: ${comment.cmtNum},
+                                                            cmtContent: document.getElementById('editText_${comment.cmtNum}').value,
+                                                            atcNum: ${comment.atcNum},
+                                                            memId: ${comment.memId}
+                                                    })" class="btn btn-danger btn-sm">삭제</button>
                                 ` : ''}
+                                
                             </div>
                         </div>
                     </p>
@@ -63,8 +85,6 @@ function toggleReplyArea(commentId, cmtContent) {
 }
 
 // 답글 작성 함수
-//${comment.cmtNum}, document.getElementById('replyText_${comment.cmtNum}').textContent, ${comment.cmtHierachy}, ${comment.actNum}, ${comment.memId}
-//cmtNum, cmtContent, cmtHierachy, actNum, memId
 function submitReply(comment) {
     // TODO: 답글 작성 로직 추가
     /*console.log(`Submit reply for comment ${cmtNum}`);
@@ -74,7 +94,7 @@ function submitReply(comment) {
     const payload = decodeToken("refreshToken");
     comment.memId = payload.memId;
 
-    console.log(comment);
+    // console.log(comment);
     tokenToJson("POST", "/comment", JSON.stringify(comment), true,
         function(data, status, xhr) {
             // data : 작성후 댓글 목록 반환
@@ -95,31 +115,52 @@ function renderComment(data) {
     commentDiv.innerHTML = html;
 }
 
-function editComment(cmtNum) {
-    // id가 "comment_" + cmtNum 인 태그를 찾아서
-    // 태그 안 text 그대로 유지한채 textarea 태그로 바꿔주는 코드
-    // 댓글의 내용을 가져오기
-    const commentText = document.getElementById(`comment_${cmtNum}`).innerText;
+function toggleEditComment(commentId) {
+    const editArea = document.getElementById(`edit_${commentId}`);
+    const commentArea = document.getElementById(`comment_${commentId}`);
+    if (editArea) {
+        editArea.style.display = editArea.style.display === 'none' ? '' : 'none';
+        commentArea.style.display = commentArea.style.display === 'none' ? '' : 'none';
+    }
+}
 
-    // 댓글 내용을 표시하는 태그를 textarea로 교체
-    const commentElement = document.getElementById(`comment_${cmtNum}`);
-    const textarea = document.createElement('textarea');
-    textarea.className = 'mr-2 text-gray-800 flex-grow-1';
-    textarea.style.marginTop = '10px';
-    textarea.value = commentText;
+function editComment(comment) {
+    tokenToJson("PUT", "/comment", JSON.stringify(comment), true,
+        function(data, status, xhr) {
+            // data : 작성후 댓글 목록 반환
+            renderComment(data);
+        },
 
-    // 원래의 댓글을 숨기고 textarea를 표시
-    commentElement.style.display = 'none';
-    commentElement.after(textarea);
+        function(xhr, status, error) {
+            let errorText = JSON.parse(xhr.responseText);
 
-    // textarea에 포커스 주기
-    textarea.focus();
+            if (errorText.code == "AU_002") {
+                alert("권한이 없습니다");
+            } else {
+                alert("댓글 수정에 실패하였습니다.");
+            }
 
-    // 편집 완료 시의 이벤트 처리 (예: 엔터 키를 누르면 저장)
-    textarea.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            saveEditedComment(cmtNum, textarea.value);
         }
-    });
+    );
+}
+
+function deleteComment(comment) {
+    tokenToJson("DELETE", "/comment", JSON.stringify(comment), true,
+        function(data, status, xhr) {
+            // data : 작성후 댓글 목록 반환
+            alert("삭제되었습니다.");
+            renderComment(data);
+        },
+
+        function(xhr, status, error) {
+            let errorText = JSON.parse(xhr.responseText);
+
+            if (errorText.code == "AU_002") {
+                alert("권한이 없습니다");
+            } else {
+                alert("댓글 수정에 실패하였습니다.");
+            }
+
+        }
+    );
 }

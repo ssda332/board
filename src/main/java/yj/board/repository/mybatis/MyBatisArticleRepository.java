@@ -29,7 +29,6 @@ public class MyBatisArticleRepository implements ArticleRepository {
 
     @Override
     public Integer selectArticleCount(String seq) {
-        System.out.println("seq : " + seq);
         return articleMapper.selectArticleCount(seq);
     }
 

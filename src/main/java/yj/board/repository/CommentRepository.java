@@ -15,4 +15,6 @@ public interface CommentRepository {
     void deleteComment(String cmtNum);
 
     void updateComment(CommentUpdateDto comment);
+
+    CommentDto findOne(String cmtNum);
 }

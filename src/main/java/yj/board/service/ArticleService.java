@@ -64,6 +64,7 @@ public class ArticleService {
         String atcContent = articleDto.getAtcContent();
         articleDto.setAtcContent(atcContent.replaceAll(tempS3Url, s3Url));
 
+        // 게시글 등록 & 수정
         if (articleDto.getAtcNum().equals("new")) {
             // auto increment
             String newAtcId = String.valueOf(articleRepository.selectNewAtcNum());
