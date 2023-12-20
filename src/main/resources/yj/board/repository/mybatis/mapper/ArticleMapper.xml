@@ -16,7 +16,7 @@
     </select>
 
     <select id="findOne" resultType="yj.board.domain.article.dto.ArticleDetailDto">
-        SELECT  A.ATC_NUM, A.ATC_TITLE, A.ATC_CONTENT, B.MEM_NICKNAME ATC_WRITER, B.MEM_ID, A.ATC_ACTIVATED, C.CTG_TITLE, A.CTG_ID, A.ATC_REG_DATE, A.ATC_UPT_DATE
+        SELECT  A.ATC_NUM, A.ATC_TITLE, A.ATC_CONTENT, B.MEM_NICKNAME ATC_WRITER, B.MEM_ID, A.ATC_ACTIVATED, C.CTG_TITLE, A.CTG_ID, A.ATC_REG_DATE, A.ATC_UPT_DATE, A.ATC_VIEWS
         FROM    TB_ARTICLE A, TB_MEM B, TB_ARTICLE_CTG C
         WHERE   1=1
           AND   A.ATC_WRITER = B.MEM_ID
@@ -37,7 +37,7 @@
 
     <select id="selectArticleList" resultMap="articleResultMap">
         SELECT   TO_NUMBER(A.ATC_NUM) ATC_NUM, A.ATC_TITLE, A.ATC_CONTENT, C.MEM_NICKNAME ATC_WRITER, C.MEM_ID, TO_CHAR(A.ATC_REG_DATE, 'YYYY-MM-DD HH24:MI:SS') AS ATC_REG_DATE,
-                 TO_CHAR(A.ATC_UPT_DATE, 'YYYY-MM-DD HH24:MI:SS') AS ATC_UPT_DATE
+                 TO_CHAR(A.ATC_UPT_DATE, 'YYYY-MM-DD HH24:MI:SS') AS ATC_UPT_DATE, A.ATC_VIEWS
         FROM     TB_ARTICLE A, TB_ARTICLE_CTG B, (SELECT    MEM_ID, MEM_NICKNAME
                                                   FROM      TB_MEM) C
         WHERE    1=1
@@ -67,6 +67,12 @@
     <update id="deleteArticle">
         UPDATE TB_ARTICLE
         SET ATC_ACTIVATED = 1
+        WHERE ATC_NUM = #{atcNum}
+    </update>
+
+    <update id="updateViews">
+        UPDATE TB_ARTICLE
+        SET ATC_VIEWS = ATC_VIEWS + 1
         WHERE ATC_NUM = #{atcNum}
     </update>
 

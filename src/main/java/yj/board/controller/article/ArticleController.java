@@ -19,10 +19,11 @@ import yj.board.jwt.TokenProvider;
 import yj.board.service.ArticleService;
 import yj.board.service.S3Uploader;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -62,7 +63,7 @@ public class ArticleController {
     public ModelAndView writeArticlePage(ModelAndView mv, @RequestParam("atcNum") String atcNum) {
         if (!atcNum.equals("new")) {
             // 게시글 수정 요청일때
-            ArticleDetailDto article = articleService.findArticle(atcNum, false);
+            ArticleDetailDto article = articleService.findArticle(atcNum, false, true);
             mv.addObject("article", article);
         } else {
             // 새 게시글 작성 요청일때
@@ -96,9 +97,13 @@ public class ArticleController {
     // 게시글 상세보기 페이지 이동
     @GetMapping("/{atcSeq}")
     public ModelAndView updateArticlePage(ModelAndView mv,
-                                          @PathVariable long atcSeq) {
+                                          @PathVariable long atcSeq,
+                                          HttpServletRequest request,
+                                          HttpServletResponse response) {
         String atcNum = String.valueOf(atcSeq);
-        ArticleDetailDto article = articleService.findArticle(atcNum, true);
+        boolean hasArticleViewCookie = checkViewsCookie(request, response, atcNum);
+
+        ArticleDetailDto article = articleService.findArticle(atcNum, true, hasArticleViewCookie);
         log.debug("article = {}", article);
 
         mv.addObject("article", article);
@@ -130,6 +135,47 @@ public class ArticleController {
         return ResponseEntity.ok("success");
     }
 
+    private static boolean checkViewsCookie(HttpServletRequest request, HttpServletResponse response, String atcNum) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("article_view".equals(cookie.getName())) {
+                    String value = cookie.getValue();
+                    StringTokenizer st = new StringTokenizer(value, "_");
+
+                    while (st.hasMoreTokens()) {
+                        if (st.nextToken().equals(atcNum)) {
+                            return true;
+                        }
+                    }
+
+                    cookie.setValue(cookie.getValue() + "_" + atcNum);
+                    response.addCookie(cookie);
+                    return false;
+                }
+            }
+        }
+
+        makeViewsCookie(response, atcNum);
+        return false;
+    }
+
+    private static void makeViewsCookie(HttpServletResponse response, String atcNum) {
+        // 중복 조회 방지 쿠키 생성
+        // 자정까지 적용
+        Calendar midnight = Calendar.getInstance();
+        midnight.setTime(new Date());
+        midnight.add(Calendar.DAY_OF_MONTH, 1);
+        midnight.set(Calendar.HOUR_OF_DAY, 0);
+        midnight.set(Calendar.MINUTE, 0);
+        midnight.set(Calendar.SECOND, 0);
+
+        // 쿠키 생성 및 응답 헤더에 추가
+        Cookie articleViewCookie = new Cookie("article_view", atcNum);
+        articleViewCookie.setMaxAge((int) ((midnight.getTimeInMillis() - System.currentTimeMillis()) / 1000));
+        response.addCookie(articleViewCookie);
+    }
 /*    @PostMapping("/{seq}")
     public ResponseEntity<MemberDto> signup() {
         return null;

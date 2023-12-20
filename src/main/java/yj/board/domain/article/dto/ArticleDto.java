@@ -27,4 +27,5 @@ public class ArticleDto {
     private String atcRegDate;
     private String atcUptDate;
     private String ctgId;
+    private Integer atcViews;
 }

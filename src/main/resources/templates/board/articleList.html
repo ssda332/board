@@ -23,7 +23,10 @@
                             <span class="mr-2 text-gray-600 small" style="white-space: nowrap;" th:text="${article.atcWriter}"></span>
                         </p>
                         <!-- atcRegDate 매핑 -->
-                        <small class="text-muted" th:text="${article.atcRegDate}"></small>
+                        <p class="mb-1 text-muted">
+                            <small class="text-muted" th:text="${article.atcRegDate}"></small> | 조회수 :
+                            <span class="mr-2 text-gray-600 small" style="white-space: nowrap;" th:text="${article.atcViews}"></span>
+                        </p>
                     </div>
                     <!-- atcTitle 매핑 -->
                     <h5 class="mb-1" style="margin-top: 5px;" th:text="${article.atcTitle}"></h5>
@@ -70,6 +73,16 @@
                     </ul>
                 </div>
             </nav>
+
+            <div class="input-group small">
+                <input type="text" class="form-control border-1 small" placeholder="Search for..."
+                       aria-label="Search" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                    </button>
+                </div>
+            </div>
 
         </div>
 

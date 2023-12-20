@@ -28,4 +28,5 @@ public class ArticleDetailDto {
     private String atcUptDate;
     private String ctgId;
     private String ctgTitle;
+    private Integer atcViews;
 }

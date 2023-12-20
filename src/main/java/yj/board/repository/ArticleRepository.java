@@ -18,5 +18,6 @@ public interface ArticleRepository {
     void updateArticle(ArticleWriteDto articleDto);
     ArticleDetailDto findArticle(String atcNum);
     void deleteArticle(String atcNum);
+    void updateViews(String atcNum);
 
 }

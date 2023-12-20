@@ -10,11 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import yj.board.auth.PrincipalDetails;
 import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.member.Member;
 import yj.board.domain.member.dto.MemberUpdateDto;
@@ -56,6 +58,12 @@ public class MemberController {
 //    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public ResponseEntity<MemberDto> getMyUserInfo(HttpServletRequest request) {
         return ResponseEntity.ok(memberService.getMyUserWithAuthorities());
+    }
+
+    // 마이페이지
+    @GetMapping("/member/{memId}")
+    public ResponseEntity getMemberInfo(@PathVariable String memId, @AuthenticationPrincipal PrincipalDetails member) {
+        return null;
     }
 
     @PutMapping("/member/mypage")

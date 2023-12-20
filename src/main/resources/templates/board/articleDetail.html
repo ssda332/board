@@ -28,11 +28,16 @@
         <div class="card border-light mb-3">
             <div th:text="${article.ctgTitle}" class="card-header">Stream</div>
             <div class="card-body" style="padding-bottom: 100px;">
-                <p class="mb-1 text-muted" style="max-width: 30px; margin: 0; display: flex; align-items: center;">
-                    <img class="img-profile rounded-circle" src="/img/undraw_profile.svg">
-                    <!-- atcWriter 매핑 -->
-                    <span th:text="${article.atcWriter}" class="mr-2 text-gray-700" style="white-space: nowrap; margin: 0px 10px 0px 5px;">유저1</span>
-                </p>
+                <div class="d-flex w-100 justify-content-between">
+                    <p class="mb-1 text-muted" style="max-width: 30px; margin: 0; display: flex; align-items: center;">
+                        <img class="img-profile rounded-circle" src="/img/undraw_profile.svg">
+                        <!-- atcWriter 매핑 -->
+                        <span th:text="${article.atcWriter}" class="mr-2 text-gray-700" style="white-space: nowrap; margin: 0px 10px 0px 5px;">유저1</span>
+                    </p>
+                    <span class="mr-2 text-gray-600 small" style="white-space: nowrap;">
+                        조회수: <span th:text="${article.atcViews}"></span>
+                    </span>
+                </div>
                 <h3 th:text="${article.atcTitle}" class="card-title" style="margin-bottom: 30px; margin-top: 20px;"><b>안녕하세요 반갑습니다 잘부탁드립니다</b></h3>
                 <p id="content" th:utext="${article.atcContent}" class="card-text">안녕하세요 감사해요 잘있어요 다시만나요<br>안녕하세요 감사해요 잘있어요 다시만나요</p>
             </div>

@@ -62,4 +62,9 @@ public class MyBatisArticleRepository implements ArticleRepository {
     public void deleteArticle(String atcNum) {
         articleMapper.deleteArticle(atcNum);
     }
+
+    @Override
+    public void updateViews(String atcNum) {
+        articleMapper.updateViews(atcNum);
+    }
 }

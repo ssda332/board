@@ -77,8 +77,13 @@ public class ArticleService {
 
     }
 
-    @Transactional(readOnly = true)
-    public ArticleDetailDto findArticle(String atcNum, boolean markToHtml) {
+    @Transactional
+    public ArticleDetailDto findArticle(String atcNum, boolean markToHtml, boolean hasArticleViewCookie) {
+        // 조회수 UPDATE
+        if (!hasArticleViewCookie) {
+            articleRepository.updateViews(atcNum);
+        }
+
         ArticleDetailDto article = articleRepository.findArticle(atcNum);
 
         if (markToHtml) {

@@ -19,4 +19,5 @@ public interface ArticleMapper {
     void updateArticle(ArticleWriteDto articleDto);
     ArticleDetailDto findOne(String atcNum);
     void deleteArticle(String atcNum);
+    void updateViews(String atcNum);
 }
