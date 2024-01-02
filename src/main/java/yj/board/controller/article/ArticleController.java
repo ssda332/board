@@ -13,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import yj.board.auth.PrincipalDetails;
 import yj.board.domain.article.dto.*;
 import yj.board.domain.file.FileDto;
+import yj.board.domain.search.Search;
 import yj.board.domain.token.dto.ReissueTokenDto;
 import yj.board.jwt.JwtProperties;
 import yj.board.jwt.TokenProvider;
@@ -38,15 +39,20 @@ public class ArticleController {
     @GetMapping("")
     public ModelAndView boardMv(ModelAndView mv,
                                 @RequestParam(value="category", required=false, defaultValue="1") String category,
-                                @RequestParam(value="page", required=false, defaultValue="1") Integer page) {
+                                @RequestParam(value="page", required=false, defaultValue="1") Integer page,
+                                @ModelAttribute Search search) {
+
+        if (search.getSearchValue() != null && search.getSearchCondition() != null) {
+            log.debug("search mode");
+        }
 
         int currentPage = page != null ? page : 1;
-        int listCount = articleService.selectArticleCount(category);
+        int listCount = articleService.selectArticleCount(category, search);
         log.debug("count : {}", listCount);
 
         PageInfo pi = Pagination.getPageInfo(currentPage, listCount);
 
-        ArrayList<ArticleDto> articleList = articleService.getArticleList(pi, category);
+        ArrayList<ArticleDto> articleList = articleService.getArticleList(pi, category, search);
         log.debug("getBoardList = {}", articleList);
         log.debug("pi = {}", pi);
 

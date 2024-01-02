@@ -53,7 +53,12 @@
                         style="justify-content: center;">
                         <!-- Previous 버튼 -->
                         <li class="page-item text-center" th:class="${pi.startPage == 1} ? 'page-item disabled' : 'page-item'">
-                            <a class="page-link" th:href="@{'/article?category=' + ${category} + '&page=' + ${pi.startPage - 1}}" aria-label="Previous">
+                            <a class="page-link" th:unless="${param.searchCondition} != null"
+                               th:href="@{'/article?category=' + ${category} + '&page=' + ${pi.startPage - 1}}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                            <a class="page-link" th:if="${param.searchCondition} != null"
+                               th:href="@{/article(category=${category}, page=${pi.startPage - 1}, searchCondition=${param.searchCondition}, searchValue=${param.searchValue})}" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
@@ -61,12 +66,18 @@
                         <!-- 페이지 수를 동적으로 생성 -->
                         <li th:each="pageNum : ${#numbers.sequence(pi.startPage, pi.endPage)}"
                             th:class="${pi.currentPage == pageNum} ? 'page-item active' : 'page-item'">
-                            <a class="page-link" th:href="@{'/article?category=' + ${category} + '&page=' + ${pageNum}}" th:text="${pageNum}"></a>
+                            <a class="page-link" th:unless="${param.searchCondition} != null" th:href="@{'/article?category=' + ${category} + '&page=' + ${pageNum}}" th:text="${pageNum}"></a>
+                            <a class="page-link" th:if="${param.searchCondition} != null" th:href="@{/article(category=${category}, page=${pageNum}, searchCondition=${param.searchCondition}, searchValue=${param.searchValue})}" th:text="${pageNum}"></a>
                         </li>
 
                         <!-- Next 버튼 -->
                         <li class="page-item" th:class="${pi.endPage == pi.maxPage} ? 'page-item disabled' : 'page-item'">
-                            <a class="page-link" th:href="@{'/article?category=' + ${category} + '&page=' + ${pi.endPage + 1}}" aria-label="Next">
+                            <a class="page-link" th:unless="${param.searchCondition} != null"
+                               th:href="@{'/article?category=' + ${category} + '&page=' + ${pi.endPage + 1}}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                            <a class="page-link" th:if="${param.searchCondition} != null"
+                               th:href="@{/article(category=${category}, page=${pi.endPage + 1}, searchCondition=${param.searchCondition}, searchValue=${param.searchValue})}" aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>
@@ -74,13 +85,28 @@
                 </div>
             </nav>
 
-            <div class="input-group small">
-                <input type="text" class="form-control border-1 small" placeholder="Search for..."
-                       aria-label="Search" aria-describedby="basic-addon2">
-                <div class="input-group-append">
-                    <button class="btn btn-primary" type="button">
-                        <i class="fas fa-search fa-sm"></i>
-                    </button>
+            <!-- 검색 바 -->
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <select class="form-control" id="searchCondition">
+                            <option selected value="title">제목</option>
+                            <option value="content">내용</option>
+                            <option value="writer">작성자</option>
+                        </select>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="input-group small">
+                            <input id="searchValue" type="text" class="form-control border-1 small" placeholder="Search for..."
+                                   aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" th:onclick="search()">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -91,6 +117,13 @@
     <script>
         function redirectToNewArticle() {
             window.location.href = '/article/form?category=' + [[${category}]] + "&atcNum=new";
+        }
+
+        function search() {
+            const searchCondition = document.getElementById("searchCondition").value;
+            const searchValue = document.getElementById("searchValue").value;
+
+            window.location.href = '/article?category=' + [[${category}]] + '&page=1&searchCondition=' + searchCondition + '&searchValue=' + encodeURIComponent(searchValue);
         }
     </script>
 </section>

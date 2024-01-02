@@ -9,10 +9,12 @@
 
     <select id="selectArticleCount" parameterType="String" resultType="java.lang.Integer">
         SELECT  COUNT(*)
-        FROM    TB_ARTICLE A, TB_ARTICLE_CTG B
+        FROM    TB_ARTICLE A, TB_ARTICLE_CTG B, TB_MEM C
         WHERE   1=1
           AND     A.CTG_ID = B.CTG_ID
+          AND     A.ATC_WRITER = C.MEM_ID
           AND     B.CTG_ID = #{category}
+        <include refid="search" />
     </select>
 
     <select id="findOne" resultType="yj.board.domain.article.dto.ArticleDetailDto">
@@ -45,6 +47,7 @@
         AND      A.ATC_WRITER = C.MEM_ID
         AND      B.CTG_ID = #{category}
         AND      A.ATC_ACTIVATED = 0
+        <include refid="search" />
         ORDER BY ATC_NUM DESC
     </select>
 
@@ -75,5 +78,17 @@
         SET ATC_VIEWS = ATC_VIEWS + 1
         WHERE ATC_NUM = #{atcNum}
     </update>
+
+    <sql id="search">
+        <if test="searchCondition == 'title'">
+            AND     A.ATC_TITLE LIKE CONCAT(CONCAT('%', #{searchValue}), '%')
+        </if>
+        <if test="searchCondition == 'content'">
+            AND     A.ATC_CONTENT LIKE CONCAT(CONCAT('%', #{searchValue}), '%')
+        </if>
+        <if test="searchCondition == 'writer'">
+            AND     C.MEM_NICKNAME LIKE CONCAT(CONCAT('%', #{searchValue}), '%')
+        </if>
+    </sql>
 
 </mapper>

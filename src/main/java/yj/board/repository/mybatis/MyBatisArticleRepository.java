@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import yj.board.domain.article.dto.ArticleDetailDto;
 import yj.board.domain.article.dto.ArticleDto;
 import yj.board.domain.article.dto.ArticleWriteDto;
+import yj.board.domain.search.Search;
 import yj.board.repository.ArticleRepository;
 import yj.board.repository.mybatis.mapper.ArticleMapper;
 
@@ -28,14 +29,14 @@ public class MyBatisArticleRepository implements ArticleRepository {
     }
 
     @Override
-    public Integer selectArticleCount(String seq) {
-        return articleMapper.selectArticleCount(seq);
+    public Integer selectArticleCount(String seq, Search search) {
+        return articleMapper.selectArticleCount(seq, search.getSearchCondition(), search.getSearchValue());
     }
 
     @Override
-    public ArrayList<ArticleDto> selectArticleList(RowBounds rowBounds, String category) {
+    public ArrayList<ArticleDto> selectArticleList(RowBounds rowBounds, String category, Search search) {
 
-        return articleMapper.selectArticleList(rowBounds, category);
+        return articleMapper.selectArticleList(rowBounds, category, search.getSearchCondition(), search.getSearchValue());
     }
 
     @Override

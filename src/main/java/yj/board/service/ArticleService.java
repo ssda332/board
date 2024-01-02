@@ -14,6 +14,7 @@ import yj.board.domain.article.dto.ArticleDetailDto;
 import yj.board.domain.article.dto.ArticleDto;
 import yj.board.domain.article.dto.ArticleWriteDto;
 import yj.board.domain.article.dto.PageInfo;
+import yj.board.domain.search.Search;
 import yj.board.exception.article.ArticleAccessDeniedException;
 import yj.board.jwt.TokenProvider;
 import yj.board.repository.ArticleRepository;
@@ -47,16 +48,20 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public Integer selectArticleCount(String seq) {
-        return articleRepository.selectArticleCount(seq);
+    public Integer selectArticleCount(String seq, Search search) {
+        if (search.getSearchValue() != null && search.getSearchCondition() != null) {
+
+        }
+
+        return articleRepository.selectArticleCount(seq, search);
     }
 
-    public ArrayList<ArticleDto> getArticleList(PageInfo pi, String Category) {
+    public ArrayList<ArticleDto> getArticleList(PageInfo pi, String Category, Search search) {
         // 몇 개의 게시글을 건너 뛸 것인지
         int offset = (pi.getCurrentPage() - 1) * pi.getBoardLimit();
         RowBounds rowBounds = new RowBounds(offset, pi.getBoardLimit());
 
-        return articleRepository.selectArticleList(rowBounds, Category);
+        return articleRepository.selectArticleList(rowBounds, Category, search);
     }
 
     public void writeArticle(ArticleWriteDto articleDto) {
