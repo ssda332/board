@@ -95,6 +95,11 @@ public class ArticleService {
             article.setAtcContent(markToHtml(article.getAtcContent()));
         }
 
+        String atcContent = article.getAtcContent();
+        String s = atcContent.replaceAll("`", "\\\\`");
+        article.setAtcContent(s);
+        // ` escape 처리
+
         return article;
     }
 
