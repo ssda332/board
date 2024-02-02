@@ -30,13 +30,13 @@ function category_hireachy(categoryList) {
                 html += '<div class="bg-white py-2 collapse-inner rounded">';
 
                 childCategories.forEach(function(childCategory) {
-                    html += '<a class="collapse-item" href="/article?category=' + childCategory.ctgId + '">' + childCategory.ctgTitle + '</a>';
+                    html += '<a class="collapse-item" href="/article?category=' + childCategory.ctgId + '&ctgTitle=' + childCategory.ctgTitle + '">' + childCategory.ctgTitle + '</a>';
                 });
 
                 html += '</div></div></li>';
             } else {
                 html += '<li class="nav-item">';
-                html += '<a class="nav-link" href="/article?category=' + category.ctgId + '">';
+                html += '<a class="nav-link" href="/article?category=' + category.ctgId + '&ctgTitle=' + category.ctgTitle + '">';
                 html += '<i class="fas fa-fw fa-table"></i>';
                 html += '<span>' + category.ctgTitle + '</span></a></li>';
             }

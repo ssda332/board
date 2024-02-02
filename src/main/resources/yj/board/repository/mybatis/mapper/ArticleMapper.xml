@@ -13,7 +13,10 @@
         WHERE   1=1
           AND     A.CTG_ID = B.CTG_ID
           AND     A.ATC_WRITER = C.MEM_ID
-          AND     B.CTG_ID = #{category}
+        <if test="category != 0">
+            AND B.CTG_ID = #{category}
+        </if>
+          AND     A.ATC_ACTIVATED = 0
         <include refid="search" />
     </select>
 
@@ -45,7 +48,9 @@
         WHERE    1=1
         AND      A.CTG_ID = B.CTG_ID
         AND      A.ATC_WRITER = C.MEM_ID
-        AND      B.CTG_ID = #{category}
+        <if test="category != 0">
+            AND      B.CTG_ID = #{category}
+        </if>
         AND      A.ATC_ACTIVATED = 0
         <include refid="search" />
         ORDER BY ATC_NUM DESC

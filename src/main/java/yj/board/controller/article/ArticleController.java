@@ -3,20 +3,14 @@ package yj.board.controller.article;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import yj.board.auth.PrincipalDetails;
 import yj.board.domain.article.dto.*;
 import yj.board.domain.file.FileDto;
 import yj.board.domain.search.Search;
-import yj.board.domain.token.dto.ReissueTokenDto;
 import yj.board.jwt.JwtProperties;
-import yj.board.jwt.TokenProvider;
 import yj.board.service.ArticleService;
 import yj.board.service.S3Uploader;
 
@@ -39,6 +33,7 @@ public class ArticleController {
     @GetMapping("")
     public ModelAndView boardMv(ModelAndView mv,
                                 @RequestParam(value="category", required=false, defaultValue="1") String category,
+                                @RequestParam(value="ctgTitle", required=false, defaultValue="전체 글") String ctgTitle,
                                 @RequestParam(value="page", required=false, defaultValue="1") Integer page,
                                 @ModelAttribute Search search) {
 
@@ -56,9 +51,12 @@ public class ArticleController {
         log.debug("getBoardList = {}", articleList);
         log.debug("pi = {}", pi);
 
+        log.debug("title = {}", ctgTitle);
+
         mv.addObject("list", articleList);
         mv.addObject("pi", pi);
         mv.addObject("category", category);
+        mv.addObject("ctgTitle", ctgTitle);
         mv.setViewName("board/articleList");
 
         return mv;

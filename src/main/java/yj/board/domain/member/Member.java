@@ -1,21 +1,13 @@
 package yj.board.domain.member;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import yj.board.domain.member.dto.AuthorityDto;
-import yj.board.domain.member.dto.MemberDto;
 
 import javax.persistence.*;
-import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 //@EntityListeners(AuditingEntityListener.class)
@@ -40,11 +32,11 @@ public class Member {
     @Column(name="MEM_ID")
     private Long id;
 
-//    @Pattern(regexp = "^[a-zA-Z0-9]{4,12}$", message = "ID는 숫자와 영문 대,소문자 조합으로 4자 이상 12자 이하입니다.")
+    //    @Pattern(regexp = "^[a-zA-Z0-9]{4,12}$", message = "ID는 숫자와 영문 대,소문자 조합으로 4자 이상 12자 이하입니다.")
     @Column(name="MEM_USERID")
     private String loginId;
 
-//    @Pattern(regexp = "^[A-Za-z0-9]{8,12}$", message = "비밀번호는 영문 대,소문자와 숫자 8자 이상 12자 이하입니다.")
+    //    @Pattern(regexp = "^[A-Za-z0-9]{8,12}$", message = "비밀번호는 영문 대,소문자와 숫자 8자 이상 12자 이하입니다.")
     @Column(name="MEM_PASSWORD")
     private String password;
 
@@ -70,3 +62,4 @@ public class Member {
     private Set<Authority> authorities;
 
 }
+

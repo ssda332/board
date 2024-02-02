@@ -140,8 +140,7 @@
                 document.getElementById('writeCommentArea').value = '';
             });
 
-        </script>
-        <script>
+            <!-- toast ui viewer -->
             const viewer = toastui.Editor.factory({
                 el: document.querySelector('#viewer'),
                 viewer: true,
@@ -149,6 +148,7 @@
                 initialValue: content
             });
 
+            // css 적용될때까지 보이지 않게 하기
             document.addEventListener('DOMContentLoaded', function() {
                 let viewer = document.getElementById('viewer');
                 viewer.style.display = 'block';
