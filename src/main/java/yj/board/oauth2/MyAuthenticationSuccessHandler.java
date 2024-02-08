@@ -93,8 +93,14 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
     }
 
     public String createTargetUrl(TokenDto tokenDto) {
-        // accessToken을 쿼리스트링에 담는 url을 만들어준다.
-        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:9091/")
+        // 환경 변수에서 도메인 이름을 읽어오고, 설정되지 않았다면 기본값을 사용
+        String serverDomain = System.getenv("SERVER_DOMAIN");
+        if (serverDomain == null || serverDomain.isEmpty()) {
+            serverDomain = "localhost:9091"; // 기본값 설정
+        }
+
+        // accessToken과 refreshToken을 쿼리스트링에 담는 URL 생성
+        String targetUrl = UriComponentsBuilder.fromUriString("http://" + serverDomain + "/")
                 .queryParam("accessToken", tokenDto.getAccessToken())
                 .queryParam("refreshToken", tokenDto.getRefreshToken())
                 .build()
