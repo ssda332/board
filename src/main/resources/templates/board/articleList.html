@@ -7,7 +7,7 @@
 <section class="container-fluid">
     <div class="d-flex justify-content-between align-items-center">
         <h1 class="h3 mb-2 text-gray-800" th:text="${ctgTitle}">게시판</h1>
-        <button type="button" class="btn btn-primary" onclick="redirectToNewArticle()">글쓰기</button>
+        <button type="button" class="btn btn-primary" id="writeButton" onclick="redirectToNewArticle()" style="display: none">글쓰기</button>
     </div>
     <hr>
 
@@ -115,6 +115,15 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const writeButton = document.getElementById('writeButton'); // ID로 글쓰기 버튼 선택
+            const authorization = localStorage.getItem('Authorization'); // localStorage에서 Authorization 값 가져오기
+
+            if (authorization) {
+                writeButton.style.display = 'block'; // Authorization이 있으면 버튼을 보이게 설정
+            }
+        });
+
         function redirectToNewArticle() {
             window.location.href = '/article/form?category=' + [[${category}]] + "&atcNum=new";
         }
