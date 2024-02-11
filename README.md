@@ -16,6 +16,11 @@
 ### DB
 - Oracle
 
+### Infra
+- AWS EC2
+- AWS S3
+- AWS Route53
+
 * * *
 ## 핵심 요구사항
 - MVC 프레임워크 기반 웹 어플리케이션 서버 구현
@@ -25,21 +30,19 @@
 
 * * *
 ## 기능
-- 회원가입, 로그인, OAuth2 로그인(google), 마이페이지
+- 회원가입, 로그인, OAuth2 로그인(google)
 - 관리자 메뉴(유저, 카테고리, 게시글, 댓글)
 - 게시판, 댓글 CRUD(글 열람, 글쓰기, 댓글달기)
 
 * * *
 ## 시스템 아키텍처
 
-![SYSTEM ARCHITECTURE drawio](https://github.com/ssda332/board/assets/82029665/2f7f6a8f-2828-4ca1-8ba9-e5fb34df1b85)
-- WAS와 DB 서버만을 둔 MPA 방식의 구조로 설계하였습니다. 
-- 추후 클라우드 환경 구축까지 고려하였습니다.
+![시스템 아키텍쳐](https://github.com/ssda332/board/assets/82029665/2c6c8a37-6e7c-40f2-95fa-f2b126faff29)
 
 
 * * *
 ## ERD
-![2023](https://github.com/ssda332/board/assets/82029665/2978302b-703a-4ea3-b724-dcabf3b9132d)
+![스크린샷 2024-02-10 195027](https://github.com/ssda332/board/assets/82029665/3839310a-7cfe-4503-bbec-c2565ca4057f)
 
 * * *
 ## 핵심 기능 설명
@@ -77,3 +80,4 @@ Google 서버와 통신하여 유저 정보를 가져오고, 해당 정보와 �
 게시글에서 이미지 업로드시 임시 파일로 저장하고, 게시글이 등록되었을 때
 이미지 원본 파일을 저장합니다. 임시 파일은 S3 버킷 내에서 수명 주기 규칙을 주어 일정 시간이
 지나면 삭제돼서 이미지가 사용되지 않는 파일이 계속 쌓이지 않도록 하였습니다.
+
