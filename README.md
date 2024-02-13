@@ -20,6 +20,7 @@
 - AWS EC2
 - AWS S3
 - AWS Route53
+- Oracle Cloud Database
 
 * * *
 ## 핵심 요구사항
