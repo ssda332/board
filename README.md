@@ -1,5 +1,7 @@
 # My Board
 게시판 웹 사이트 개발 프로젝트
+
+Link : https://yjboard.site
 * * *
 
 ## 사용 기술

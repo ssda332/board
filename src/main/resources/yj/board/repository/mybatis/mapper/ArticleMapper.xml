@@ -20,6 +20,13 @@
         <include refid="search" />
     </select>
 
+    <select id="selectMemberArticleCount" parameterType="Long" resultType="java.lang.Integer">
+        SELECT  COUNT(*)
+        FROM    TB_ARTICLE
+        WHERE   ATC_WRITER = #{id}
+
+    </select>
+
     <select id="findOne" resultType="yj.board.domain.article.dto.ArticleDetailDto">
         SELECT  A.ATC_NUM, A.ATC_TITLE, A.ATC_CONTENT, B.MEM_NICKNAME ATC_WRITER, B.MEM_ID, A.ATC_ACTIVATED, C.CTG_TITLE, A.CTG_ID, A.ATC_REG_DATE, A.ATC_UPT_DATE, A.ATC_VIEWS
         FROM    TB_ARTICLE A, TB_MEM B, TB_ARTICLE_CTG C

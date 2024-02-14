@@ -17,4 +17,7 @@ public interface CommentRepository {
     void updateComment(CommentUpdateDto comment);
 
     CommentDto findOne(String cmtNum);
+
+    int selectMemberCommentCount(Long id);
+
 }

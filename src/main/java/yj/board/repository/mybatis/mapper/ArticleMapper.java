@@ -22,4 +22,6 @@ public interface ArticleMapper {
     ArticleDetailDto findOne(String atcNum);
     void deleteArticle(String atcNum);
     void updateViews(String atcNum);
+    Integer selectMemberArticleCount(Long id);
+
 }

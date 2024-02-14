@@ -35,8 +35,6 @@ public class TokenController {
         TokenDto tokenDto = tokenService.login(loginDto);
         responseTokenDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken(), response);
 
-        response.addCookie(new Cookie("testCookie", "testCookie"));
-
         return ResponseEntity.ok(tokenDto);
     }
 

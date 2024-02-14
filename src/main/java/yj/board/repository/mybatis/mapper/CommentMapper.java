@@ -17,5 +17,5 @@ public interface CommentMapper {
     void deleteCommentByArticle(String atcNum);
     void deleteComment(String cmtNum);
     void updateComment(CommentUpdateDto comment);
-
+    int selectMemberCommentCount(Long id);
 }

@@ -43,6 +43,7 @@ public class CommentController {
     // 댓글 수정
     @PutMapping("")
     public ResponseEntity<ArrayList<CommentDto>> updateComment(@RequestBody @Valid CommentUpdateDto comment, @AuthenticationPrincipal PrincipalDetails member) {
+        log.info("member : {}", member.getMember().getLoginId());
         checkAuth(comment.getMemId(), member);
 
         commentService.updateComment(comment);

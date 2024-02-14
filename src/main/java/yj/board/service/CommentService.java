@@ -43,4 +43,8 @@ public class CommentService {
     public void updateComment(CommentUpdateDto comment) {
         commentRepository.updateComment(comment);
     }
+
+    public int selectMemberCommentCount(Long id) {
+        return commentRepository.selectMemberCommentCount(id);
+    }
 }

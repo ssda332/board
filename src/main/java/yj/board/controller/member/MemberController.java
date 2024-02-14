@@ -1,30 +1,21 @@
 package yj.board.controller.member;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.Claim;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import yj.board.auth.PrincipalDetails;
-import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.member.Member;
+import yj.board.domain.member.dto.MemberDto;
+import yj.board.domain.member.dto.MemberInfoDto;
 import yj.board.domain.member.dto.MemberUpdateDto;
-import yj.board.domain.token.dto.TokenDto;
-import yj.board.jwt.JwtProperties;
-import yj.board.jwt.TokenProvider;
+import yj.board.domain.member.dto.MyPageInfoDto;
+import yj.board.service.ArticleService;
+import yj.board.service.CommentService;
 import yj.board.service.MemberService;
-import yj.board.service.TokenService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -37,13 +28,17 @@ public class MemberController {
 
     @Autowired
     private final MemberService memberService;
+    @Autowired
+    private final ArticleService articleService;
+    @Autowired
+    private final CommentService commentService;
 
     @GetMapping("")
     public String signUp() {
         return "members/register";
     }
 
-    @GetMapping("/member/mypage")
+    @GetMapping("/mypage")
     public String myPage() {
         return "members/mypage";
     }
@@ -60,16 +55,24 @@ public class MemberController {
         return ResponseEntity.ok(memberService.getMyUserWithAuthorities());
     }
 
-    // 마이페이지
-    @GetMapping("/member/{memId}")
-    public ResponseEntity getMemberInfo(@PathVariable String memId, @AuthenticationPrincipal PrincipalDetails member) {
-        return null;
+    @PostMapping("/mypage")
+    public ResponseEntity<MyPageInfoDto> myPageInfo(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        Member member = principalDetails.getMember();
+        Long id = member.getId();
+        int articleCount = articleService.selectMemberArticleCount(id);
+        int commentCount = commentService.selectMemberCommentCount(id);
+        MemberInfoDto memberInfoDto = MemberInfoDto.from(member);
+        MyPageInfoDto myPageInfoDto = MyPageInfoDto.builder()
+                .articleCount(articleCount)
+                .commentCount(commentCount)
+                .memberInfoDto(memberInfoDto)
+                .build();
+
+        return ResponseEntity.ok(myPageInfoDto);
     }
 
-    @PutMapping("/member/mypage")
-//    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PutMapping("/mypage")
     public ResponseEntity updateMember(@Valid @RequestBody MemberUpdateDto updateDto) {
-//        return ResponseEntity.ok(memberService.getMyUserWithAuthorities());
         memberService.updateMember(updateDto);
         return ResponseEntity.ok("ok");
     }

@@ -1,105 +1,127 @@
 <!DOCTYPE html>
 <html th:replace="~{fragments/layout :: layout(~{::title},~{::section})}" xmlns:th="http://www.thymeleaf.org">
 <!--<html>-->
-<head>
-    <title>board</title>
-</head>
-<body>
-    <section class="container-fluid">
-        <h1 class="h3 mb-2 text-gray-800">마이페이지</h1>
-        <hr>
+    <head>
+        <title>board</title>
+    </head>
+    <body>
+        <section class="container-fluid">
+            <h1 class="h3 mb-2 text-gray-800">마이페이지</h1>
+            <hr>
 
-        <div class="row">
-            <!-- 게시글 수 -->
-            <div class="col-xl-6 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                    게시글 수</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+            <div class="row">
+                <!-- 게시글 수 -->
+                <div class="col-xl-6 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        게시글 수</div>
+                                    <div id="articleCount" class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                </div>
                             </div>
-                            <div class="col-auto">
-                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 댓글 수 -->
+                <div class="col-xl-6 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        댓글 수</div>
+                                    <div id="commentCount" class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row" style="color: #2d2e33">
+                <div class="col-sm-12" style="display: flex; justify-content: center">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-black-80 font-weight-bold">내 정보</h5>
+                            <p class="card-text">
+                                <div class="form-group">
+                                    <label for="memId">ID</label>
+                                    <input type="input" class="form-control" id="memId" aria-describedby="emailHelp" value="유저1" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label for="memNickname">닉네임</label>
+                                    <input type="input" class="form-control" id="memNickname" aria-describedby="emailHelp">
+                                </div>
+                                <button id="changeNickname" type="button" class="btn btn-primary">변경</button>
+                            </p>
+                            <a href="#" class="btn btn-primary">회원 탈퇴</a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 댓글 수 -->
-            <div class="col-xl-6 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                    댓글 수</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-comments fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <script th:inline="javascript">
 
-        </div>
+                tokenToJson("POST", "/members/mypage", null, true,
+                    function(data, status, xhr) {
+                        updateUIWithData(data);
+                    },
 
-        <div class="row" style="color: #2d2e33">
-            <div class="col-sm-12" style="display: flex; justify-content: center">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title text-black-80 font-weight-bold">내 정보</h5>
-                        <p class="card-text">
-                            <div class="form-group">
-                                <label for="memId">ID</label>
-                                <input type="input" class="form-control" id="memId" aria-describedby="emailHelp" value="유저1" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label for="memNickname">닉네임</label>
-                                <input type="input" class="form-control" id="memNickname" aria-describedby="emailHelp">
-                            </div>
-                            <div class="input-group mb-3" style="margin-top: 30px;">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="inputGroupFileAddon01">프로필 사진</span>
-                                </div>
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
-                                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">변경</button>
-                        </p>
-                        <a href="#" class="btn btn-primary">회원 탈퇴</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    function(xhr, status, error) {
+                        alert("error");
+                    }
+                );
 
-    </section>
+                document.getElementById('changeNickname').addEventListener('click', function() {
+                    let updateDto = {
+                        nickname: document.getElementById('memNickname').value
+                    };
 
-    <script>
+                    updateDto = JSON.stringify(updateDto);
 
-        // 모든 카테고리 조회
-        /*ajaxJson("GET", "/category", null, false,
-            function(data, status, xhr) {
-                var categoryList = data; // 받아온 JSON 데이터
-                let html = category_hireachy(categoryList);
+                    tokenToJson("PUT", "/members/mypage", updateDto, true,
+                        function(data, status, xhr) {
+                            alert("변경되었습니다.");
+                            location.href = "/";
+                        },
 
-                // 결과 HTML을 특정 div에 추가
-                document.getElementById('accordionSidebar').innerHTML += html;
-            },
+                        function(xhr, status, error) {
+                            alert("error");
+                            console.log(xhr);
+                        }
+                    );
+                });
 
-            function(xhr, status, error) {
-                alert("카테고리 조회 실패!");
-            }
-        );*/
+                // 서버로부터 응답받은 데이터를 사용하여 HTML 요소에 값을 할당하는 함수
+                function updateUIWithData(data) {
+                    // 게시글 수 업데이트
+                    document.getElementById('articleCount').textContent = data.articleCount;
+
+                    // 댓글 수 업데이트
+                    document.getElementById('commentCount').textContent = data.commentCount;
+
+                    // 회원 정보 업데이트
+                    // ID 값을 업데이트 하려면, 해당 요소가 수정 가능해야 합니다. 여기서는 단순히 보여주기만 하므로, 예시로 남깁니다.
+                    document.getElementById('memId').value = data.memberInfoDto.loginId;
+
+                    // 닉네임 업데이트
+                    document.getElementById('memNickname').value = data.memberInfoDto.nickname;
+                }
 
 
+            </script>
 
-    </script>
-</body>
+        </section>
+
+    </body>
 </html>

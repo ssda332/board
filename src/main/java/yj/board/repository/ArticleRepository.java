@@ -20,5 +20,6 @@ public interface ArticleRepository {
     ArticleDetailDto findArticle(String atcNum);
     void deleteArticle(String atcNum);
     void updateViews(String atcNum);
+    Integer selectMemberArticleCount(Long id);
 
 }

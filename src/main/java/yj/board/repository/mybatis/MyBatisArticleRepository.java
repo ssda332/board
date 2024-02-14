@@ -68,4 +68,9 @@ public class MyBatisArticleRepository implements ArticleRepository {
     public void updateViews(String atcNum) {
         articleMapper.updateViews(atcNum);
     }
+
+    @Override
+    public Integer selectMemberArticleCount(Long id) {
+        return articleMapper.selectMemberArticleCount(id);
+    }
 }

@@ -43,4 +43,9 @@
         WHERE CMT_NUM = #{cmtNum}
     </update>
 
+    <select id="selectMemberCommentCount" parameterType="Long" resultType="java.lang.Integer">
+        SELECT  COUNT(*)
+        FROM    TB_COMMENT
+        WHERE   MEM_ID = #{id}
+    </select>
 </mapper>

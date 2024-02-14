@@ -24,6 +24,29 @@
     <!-- TOAST UI EDITOR -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
+    <th:block th:fragment="bootstrap-js">
+        <!-- Bootstrap core JavaScript-->
+        <script src="/vendor/jquery/jquery.min.js"></script>
+
+        <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Core plugin JavaScript-->
+        <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+        <!-- Custom scripts for all pages-->
+        <script src="/js/sb-admin-2.min.js"></script>
+
+        <!-- Page level plugins -->
+        <!--<script src="/vendor/chart.js/Chart.min.js"></script>-->
+
+        <!-- Page level custom scripts -->
+        <!--<script src="/js/demo/chart-area-demo.js"></script>
+        <script src="/js/demo/chart-pie-demo.js"></script>-->
+    </th:block>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/common_hierachy.js"></script>
+
 </head>
 
 <body id="page-top">
@@ -246,7 +269,7 @@
                                 <!-- Dropdown - User Information -->
                                 <div id="user-information" class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                     aria-labelledby="userDropdown">
-                                    <a class="dropdown-item" id="member_mypage" href="/members/member/mypage">
+                                    <a class="dropdown-item" id="member_mypage" href="/members/mypage">
                                         <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                         MyPage
                                     </a>
@@ -644,28 +667,6 @@
         </div>
     </div>
 
-    <th:block th:fragment="bootstrap-js">
-        <!-- Bootstrap core JavaScript-->
-        <script src="/vendor/jquery/jquery.min.js"></script>
-
-        <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-        <!-- Core plugin JavaScript-->
-        <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
-
-        <!-- Custom scripts for all pages-->
-        <script src="/js/sb-admin-2.min.js"></script>
-
-        <!-- Page level plugins -->
-        <!--<script src="/vendor/chart.js/Chart.min.js"></script>-->
-
-        <!-- Page level custom scripts -->
-        <!--<script src="/js/demo/chart-area-demo.js"></script>
-        <script src="/js/demo/chart-pie-demo.js"></script>-->
-    </th:block>
-
-    <script src="/js/common.js"></script>
-    <script src="/js/common_hierachy.js"></script>
     <script th:inline="javascript">
 
         $(document).ready(function() {

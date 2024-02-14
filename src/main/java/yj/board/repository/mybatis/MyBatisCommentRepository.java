@@ -28,6 +28,11 @@ public class MyBatisCommentRepository implements CommentRepository {
     }
 
     @Override
+    public int selectMemberCommentCount(Long id) {
+        return commentMapper.selectMemberCommentCount(id);
+    }
+
+    @Override
     public void insertComment(CommentWriteDto comment) {
         commentMapper.insertComment(comment);
     }

@@ -56,6 +56,11 @@ public class ArticleService {
         return articleRepository.selectArticleCount(seq, search);
     }
 
+    @Transactional(readOnly = true)
+    public Integer selectMemberArticleCount(Long id) {
+        return articleRepository.selectMemberArticleCount(id);
+    }
+
     public ArrayList<ArticleDto> getArticleList(PageInfo pi, String Category, Search search) {
         // 몇 개의 게시글을 건너 뛸 것인지
         int offset = (pi.getCurrentPage() - 1) * pi.getBoardLimit();
