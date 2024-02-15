@@ -1,5 +1,6 @@
 package yj.board.controller.member;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.member.dto.MemberInfoDto;
 import yj.board.domain.member.dto.MemberUpdateDto;
 import yj.board.domain.member.dto.MyPageInfoDto;
+import yj.board.exception.member.CAuthenticationEntryPointException;
 import yj.board.service.ArticleService;
 import yj.board.service.CommentService;
 import yj.board.service.MemberService;
@@ -57,7 +59,14 @@ public class MemberController {
 
     @PostMapping("/mypage")
     public ResponseEntity<MyPageInfoDto> myPageInfo(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        Member member = principalDetails.getMember();
+        Member member;
+
+        try {
+            member = principalDetails.getMember();
+        } catch (NullPointerException e) {
+            throw new CAuthenticationEntryPointException();
+        }
+
         Long id = member.getId();
         int articleCount = articleService.selectMemberArticleCount(id);
         int commentCount = commentService.selectMemberCommentCount(id);

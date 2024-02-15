@@ -73,6 +73,7 @@ function reissue(type, url, rData, isToken, callbackSuccess, callbackError) {
         url: "/token",
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(data),
+        async: false,
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-type","application/json");
         },
