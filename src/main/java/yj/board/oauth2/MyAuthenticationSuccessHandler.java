@@ -55,11 +55,13 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
 
         // refresh token 쿠키로 보내기
         Cookie refreshToken = new Cookie(JwtProperties.REFRESH_HEADER_STRING, tokenDto.getRefreshToken());
+
         String serverDomain = System.getenv("SERVER_DOMAIN");
-        if (serverDomain == null || serverDomain.isEmpty()) {
+        if (!(serverDomain == null || serverDomain.isEmpty())) {
             // 개발서버일경우, secure설정
             refreshToken.setSecure(true);
         }
+
         refreshToken.setPath("/");
         refreshToken.setHttpOnly(true);
         response.addCookie(refreshToken);

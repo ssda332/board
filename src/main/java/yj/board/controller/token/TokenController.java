@@ -70,7 +70,7 @@ public class TokenController {
         Cookie cookie = new Cookie(JwtProperties.REFRESH_HEADER_STRING, refreshToken);
 
         String serverDomain = System.getenv("SERVER_DOMAIN");
-        if (serverDomain == null || serverDomain.isEmpty()) {
+        if (!(serverDomain == null || serverDomain.isEmpty())) {
             // 개발서버일경우, secure설정
             cookie.setSecure(true);
         }
