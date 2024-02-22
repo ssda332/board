@@ -17,8 +17,10 @@ import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.token.dto.ReissueTokenDto;
 import yj.board.domain.token.dto.TokenDto;
 import yj.board.exception.member.LoginFailException;
+import yj.board.jwt.JwtProperties;
 import yj.board.service.TokenService;
 
+import javax.servlet.http.Cookie;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +42,10 @@ class TokenControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private TokenService tokenService;
+    public static final String TEST_ID = "loginTest";
+    public static final String TEST_PW = "testTest1";
+    public static final String TEST_ACCESS_TOKEN = "testat";
+    public static final String TEST_REFRESH_TOKEN = "testrt";
 
     @Test
     @DisplayName("로그인 성공")
@@ -57,8 +63,10 @@ class TokenControllerTest {
         //then
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(header().exists("Authorization"))
-                .andExpect(header().exists("RefreshToken"));
+                .andExpect(header().exists(JwtProperties.HEADER_STRING))
+                .andExpect(header().string(JwtProperties.HEADER_STRING, TEST_ACCESS_TOKEN))
+                .andExpect(cookie().exists(JwtProperties.REFRESH_HEADER_STRING))
+                .andExpect(cookie().value(JwtProperties.REFRESH_HEADER_STRING, TEST_REFRESH_TOKEN));
     }
 
     @Test
@@ -93,28 +101,32 @@ class TokenControllerTest {
         String newAccessToken = "new";
         String newRefreshToken = "new";
         String object = objectMapper.writeValueAsString(tokenDto);
-//        given(tokenService.reissue(any(TokenDto.class))).willReturn(tokenDto = TokenDto.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build());
-        given(tokenService.reissue(any(TokenDto.class))).willReturn(ReissueTokenDto.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).memberDto(getMemberDto()).build());
+        given(tokenService.reissue(any(TokenDto.class)))
+                .willReturn(ReissueTokenDto.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).memberDto(getMemberDto()).build());
         //when
         ResultActions actions = requestRegisterUrl(object, "/token", "put");
 
         //then
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(header().exists("Authorization"))
-                .andExpect(header().exists("RefreshToken"))
-                .andExpect(header().string("Authorization", "Bearer " + newAccessToken))
-                .andExpect(header().string("RefreshToken", "Bearer " + newRefreshToken));
+                .andExpect(header().exists(JwtProperties.HEADER_STRING))
+                .andExpect(header().string(JwtProperties.HEADER_STRING, newAccessToken))
+                .andExpect(cookie().exists(JwtProperties.REFRESH_HEADER_STRING))
+                .andExpect(cookie().value(JwtProperties.REFRESH_HEADER_STRING, newRefreshToken))
+                ;
     }
 
     private ResultActions requestRegisterUrl(String object, String url, String method) throws Exception {
-        ResultActions actions = mockMvc.perform(post(url)
-                .content(object)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON));
+        ResultActions actions;
 
         if (method.equals("put")) {
             actions = mockMvc.perform(put(url)
+                    .cookie(new Cookie(JwtProperties.REFRESH_HEADER_STRING, TEST_REFRESH_TOKEN)) // 쿠키 추가
+                    .content(object)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON));
+        } else {
+            actions = mockMvc.perform(post(url)
                     .content(object)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON));
@@ -124,14 +136,14 @@ class TokenControllerTest {
     }
 
     private static LoginDto getLoginDto() {
-        LoginDto loginDto = new LoginDto("loginTest", "Testtest1");
+        LoginDto loginDto = new LoginDto(TEST_ID, TEST_PW);
         return loginDto;
     }
 
     private static TokenDto getTokenDto() {
         TokenDto tokenDto = TokenDto.builder()
-                .accessToken("testAccessToken")
-                .refreshToken("testRefreshToken")
+                .accessToken(TEST_ACCESS_TOKEN)
+                .refreshToken(TEST_REFRESH_TOKEN)
                 .build();
         return tokenDto;
     }

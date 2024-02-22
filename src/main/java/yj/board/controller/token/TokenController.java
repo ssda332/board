@@ -39,7 +39,20 @@ public class TokenController {
     }
 
     @PutMapping("")
-    public ResponseEntity<ReissueTokenDto> reissue(@RequestBody TokenDto tokenDto, HttpServletResponse response) {
+    public ResponseEntity<ReissueTokenDto> reissue(@RequestBody String accessToken, HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = null;
+
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals(JwtProperties.REFRESH_HEADER_STRING)) {
+                refreshToken = cookie.getValue();
+            }
+        }
+
+        TokenDto tokenDto = TokenDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
         ReissueTokenDto reissueDto = tokenService.reissue(tokenDto);
         responseTokenDto(reissueDto.getAccessToken(), reissueDto.getRefreshToken(), response);
 
@@ -48,7 +61,23 @@ public class TokenController {
 
     public void responseTokenDto(String accessToken, String refreshToken, HttpServletResponse response) {
         response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
-        response.addHeader(JwtProperties.REFRESH_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshToken);
+        Cookie cookie = getRefreshTokenCookie(refreshToken);
+
+        response.addCookie(cookie);
+    }
+
+    private static Cookie getRefreshTokenCookie(String refreshToken) {
+        Cookie cookie = new Cookie(JwtProperties.REFRESH_HEADER_STRING, refreshToken);
+
+        String serverDomain = System.getenv("SERVER_DOMAIN");
+        if (serverDomain == null || serverDomain.isEmpty()) {
+            // 개발서버일경우, secure설정
+            cookie.setSecure(true);
+        }
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(JwtProperties.EXPIRATION_TIME_REFRESH / 1000);
+        return cookie;
     }
 
 }

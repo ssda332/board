@@ -22,7 +22,14 @@
 
     <insert id="insertComment">
         INSERT INTO TB_COMMENT (CMT_NUM, CMT_CONTENT, CMT_HIERACHY, CMT_ACTIVATED, CMT_REG_DATE, CMT_UPT_DATE, ATC_NUM, CMT_PRT_NUM, MEM_ID)
-        VALUES (CMT_NUM_SEQ.NEXTVAL, #{cmtContent}, #{cmtHierachy}, 0, SYSDATE, SYSDATE, #{atcNum}, #{cmtPrtNum}, #{memId})
+        VALUES (CMT_NUM_SEQ.NEXTVAL, #{cmtContent}, #{cmtHierachy}, 0, SYSDATE, SYSDATE, #{atcNum},
+        <if test="cmtPrtNum != null and cmtPrtNum != ''">
+            #{cmtPrtNum}
+        </if>
+        <if test="cmtPrtNum == null or cmtPrtNum == ''">
+            null
+        </if>,
+        #{memId})
     </insert>
 
     <update id="deleteCommentByArticle">

@@ -3,7 +3,7 @@
  */
 function generateCommentHtml(comments, parentId = null) {
     let html = '';
-    const payload = decodeToken("refreshToken");
+    const payload = decodeToken(TOKEN_NAME);
 
     for (const comment of comments) {
         if (comment.cmtPrtNum === parentId) {
@@ -58,7 +58,7 @@ function generateCommentHtml(comments, parentId = null) {
                                                     cmtContent: document.getElementById('replyText_${comment.cmtNum}').value,
                                                     cmtHierachy: ${comment.cmtHierachy} + 1,
                                                     atcNum: ${comment.atcNum},
-                                                    memId: ''
+                                                    memId: payload.memId
                                             })" class="btn btn-outline-secondary" type="button">작성</button>
                         </div>
                     </div>
@@ -87,14 +87,6 @@ function toggleReplyArea(commentId, cmtContent) {
 // 답글 작성 함수
 function submitReply(comment) {
     // TODO: 답글 작성 로직 추가
-    /*console.log(`Submit reply for comment ${cmtNum}`);
-    // 작성 후 원하는 동작 수행
-    toggleReplyArea(commentId);*/
-    // 권한 검색
-    const payload = decodeToken("refreshToken");
-    comment.memId = payload.memId;
-
-    // console.log(comment);
     tokenToJson("POST", "/comment", JSON.stringify(comment), true,
         function(data, status, xhr) {
             // data : 작성후 댓글 목록 반환

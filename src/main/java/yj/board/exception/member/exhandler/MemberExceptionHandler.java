@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import yj.board.domain.error.ErrorCode;
 import yj.board.domain.error.ErrorResponse;
 import yj.board.exception.member.*;
+import yj.board.jwt.JwtProperties;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,8 +86,14 @@ public class MemberExceptionHandler {
      */
     @ExceptionHandler(RefreshTokenException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    protected ErrorResponse handleRefreshTokenException(RefreshTokenException e) {
+    protected ErrorResponse handleRefreshTokenException(RefreshTokenException e, HttpServletResponse response) {
+        // "RefreshToken" 쿠키를 만들어 만료시킵니다.
+        Cookie refreshTokenCookie = new Cookie(JwtProperties.REFRESH_HEADER_STRING, null); // 쿠키 값으로 null을 설정
+        refreshTokenCookie.setMaxAge(0); // 쿠키의 만료 시간을 0으로 설정하여 즉시 만료
+        response.addCookie(refreshTokenCookie); // 응답에 쿠키 추가
+
         return buildFieldErrors(ErrorCode.REFRESH_TOKEN_EXPIRED, null);
+
     }
 
     /**

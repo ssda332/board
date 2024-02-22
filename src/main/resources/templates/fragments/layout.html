@@ -46,7 +46,13 @@
 
     <script src="/js/common.js"></script>
     <script src="/js/common_hierachy.js"></script>
-
+    <script>
+        /**
+         *
+         * 액세스토큰 이름 전역변수
+         */
+        window.TOKEN_NAME = 'Authorization';
+    </script>
 </head>
 
 <body id="page-top">
@@ -366,9 +372,9 @@
                     }
 
                     let accessToken = localStorage.getItem("Authorization");
-                    let refreshToken = localStorage.getItem("refreshToken");
+                    // let refreshToken = localStorage.getItem("refreshToken");
                     let payload = JSON.parse(atob(accessToken.split(".")[1]));
-                    let refPayload = JSON.parse(atob(refreshToken.split(".")[1]));
+                    // let refPayload = JSON.parse(atob(refreshToken.split(".")[1]));
 
                     // member_mypage - mypage tag id
                     /*let myPageLinkTag = document.getElementById('member_mypage');

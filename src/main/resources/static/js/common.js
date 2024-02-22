@@ -22,7 +22,6 @@ function tokenToJson(type, url, data, isToken, callbackSuccess, callbackError) {
         beforeSend: function (xhr) {
             // OAuth2 로그인시 쿼리 문자열 값 있음(accessToken, refreshToken)
             let queryString = window.location.search;
-            // console.log(queryString);
 
             if (queryString != "") {
                 // 쿼리 문자열 파싱
@@ -38,6 +37,7 @@ function tokenToJson(type, url, data, isToken, callbackSuccess, callbackError) {
 
 
             if (isToken) {
+                // access token을 requestHeader에 추가
                 xhr.setRequestHeader("Content-type","application/json");
                 xhr.setRequestHeader("Authorization", localStorage.getItem("Authorization"));
             }
@@ -49,6 +49,7 @@ function tokenToJson(type, url, data, isToken, callbackSuccess, callbackError) {
     }).fail(function(xhr, status, error) {
         let jsonResponse = JSON.parse(xhr.responseText);
         let accessToken = localStorage.getItem("Authorization");
+        console.log(accessToken);
 
         if (jsonResponse.code == "AU_001" && accessToken != null) {
             // 401 시큐리티 인증 실패 에러
@@ -60,29 +61,21 @@ function tokenToJson(type, url, data, isToken, callbackSuccess, callbackError) {
 }
 
 function reissue(type, url, rData, isToken, callbackSuccess, callbackError) {
-    const accessToken = localStorage.getItem("Authorization");
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    const data = {
-        accessToken: accessToken,
-        refreshToken: refreshToken
-    };
+    const accessToken = localStorage.getItem(TOKEN_NAME);
 
     $.ajax({
         type: "PUT",
         url: "/token",
         contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(data),
+        data: accessToken,
         async: false,
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Content-type","application/json");
         },
     }).done(function(data, status, xhr) {
         const accessToken = data.accessToken;
-        const refreshToken = data.refreshToken;
 
         localStorage.setItem("Authorization", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
 
         // callbackSuccess(data.memberDto, status, xhr);
         tokenToJson(type, url, rData, isToken, callbackSuccess, callbackError);
@@ -128,7 +121,7 @@ function decodeToken(tokenName) {
 }
 
 function isTokenValid() {
-    const payload = decodeToken("Authorization");
+    const payload = decodeToken(TOKEN_NAME);
     const exp = payload.exp;
 
     if (!exp || typeof exp !== "number") {

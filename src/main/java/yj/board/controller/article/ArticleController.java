@@ -43,15 +43,8 @@ public class ArticleController {
 
         int currentPage = page != null ? page : 1;
         int listCount = articleService.selectArticleCount(category, search);
-        log.debug("count : {}", listCount);
-
         PageInfo pi = Pagination.getPageInfo(currentPage, listCount);
-
         ArrayList<ArticleDto> articleList = articleService.getArticleList(pi, category, search);
-        log.debug("getBoardList = {}", articleList);
-        log.debug("pi = {}", pi);
-
-        log.debug("title = {}", ctgTitle);
 
         mv.addObject("list", articleList);
         mv.addObject("pi", pi);
@@ -108,7 +101,6 @@ public class ArticleController {
         boolean hasArticleViewCookie = checkViewsCookie(request, response, atcNum);
 
         ArticleDetailDto article = articleService.findArticle(atcNum, true, hasArticleViewCookie);
-        log.debug("article = {}", article);
 
         mv.addObject("article", article);
         mv.setViewName("board/articleDetail");

@@ -120,9 +120,9 @@
             ajaxJson("POST", "/token", data, false,
                 function(data, status, xhr) {
                     let accessToken = xhr.getResponseHeader('Authorization');
-                    let refreshToken = xhr.getResponseHeader('refreshToken');
+                    // let refreshToken = xhr.getResponseHeader('refreshToken');
                     localStorage.setItem("Authorization", accessToken);
-                    localStorage.setItem("refreshToken", refreshToken);
+                    // localStorage.setItem("refreshToken", refreshToken);
                     location.href = "/";
                 },
                 function(xhr, status, error) {
@@ -137,6 +137,7 @@
                 }
             );
         }
+/*
 
         function oauth2Login(){
             ajaxJson("GET", "/oauth2/authorization/google", null, false,
@@ -161,6 +162,7 @@
                 }
             );
         }
+*/
 
     </script>
 

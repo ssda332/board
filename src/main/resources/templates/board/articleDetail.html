@@ -76,7 +76,7 @@
 
         <script th:inline="javascript">
             const content = [[${article.atcContent}]];
-            const payload = decodeToken("refreshToken");
+            const payload = decodeToken(TOKEN_NAME);
             const memId = [[${article.memId}]];
 
             if (payload.memId == memId) {
@@ -121,11 +121,11 @@
             // 댓글 작성
             document.getElementById('submitButton').addEventListener('click', function() {
                 submitReply({
-                    cmtPrtNum: '',
+                    cmtPrtNum: "",
                     cmtContent: document.getElementById('writeCommentArea').value,
                     cmtHierachy: 1,
                     atcNum: [[${article.atcNum}]],
-                    memId: ''
+                    memId: payload.memId
                 });
 
                 document.getElementById('writeCommentArea').value = '';

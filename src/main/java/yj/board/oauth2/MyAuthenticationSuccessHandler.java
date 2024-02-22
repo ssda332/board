@@ -34,9 +34,6 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-
-        log.info("oauth2 ok");
-        log.info("request url : {}", request.getRequestURL());
         // OAuth2User로 캐스팅하여 인증된 사용자 정보를 가져온다.
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         //String provider = oAuth2User.getAttribute("provider"); //서비스 제공 플랫폼이 어디인지 가져옴
@@ -54,16 +51,19 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
         LoginDto loginDto = new LoginDto(memberDto.getLoginId(), JwtProperties.oauth2Password);
         TokenDto tokenDto = tokenService.login(loginDto);
 
-//        TokenDto tokenDto = tokenProvider.createToken(memberDto);
         String targetUrl = createTargetUrl(tokenDto);
 
-        /*Cookie accessToken = new Cookie(JwtProperties.HEADER_STRING, tokenDto.getAccessToken());
+        // refresh token 쿠키로 보내기
         Cookie refreshToken = new Cookie(JwtProperties.REFRESH_HEADER_STRING, tokenDto.getRefreshToken());
-//        request.setAttribute("oauth2test", "oauth2test");
-        response.addCookie(accessToken);
-        response.addCookie(refreshToken);*/
-//        response.setHeader("Authorization", tokenDto.getAccessToken());
-//        response.setHeader("refreshToken", tokenDto.getRefreshToken());
+        String serverDomain = System.getenv("SERVER_DOMAIN");
+        if (serverDomain == null || serverDomain.isEmpty()) {
+            // 개발서버일경우, secure설정
+            refreshToken.setSecure(true);
+        }
+        refreshToken.setPath("/");
+        refreshToken.setHttpOnly(true);
+        response.addCookie(refreshToken);
+
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
 
     }
@@ -102,7 +102,7 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
         // accessToken과 refreshToken을 쿼리스트링에 담는 URL 생성
         String targetUrl = UriComponentsBuilder.fromUriString("http://" + serverDomain + "/")
                 .queryParam("accessToken", tokenDto.getAccessToken())
-                .queryParam("refreshToken", tokenDto.getRefreshToken())
+//                .queryParam("refreshToken", tokenDto.getRefreshToken())
                 .build()
                 .encode(StandardCharsets.UTF_8)
                 .toUriString();

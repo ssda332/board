@@ -103,7 +103,7 @@
                 const articleDto = {atcNum: getQueryString("atcNum"),
                                     atcTitle: document.querySelector("#title").value,
                                     atcContent: editor.getMarkdown(),
-                                    atcWriter: decodeToken("refreshToken").memId,
+                                    atcWriter: decodeToken(TOKEN_NAME).memId,
                                     ctgId: document.querySelector("#selectCtg").value,
                                     tempFiles: tempFiles
                 };

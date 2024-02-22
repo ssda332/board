@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import yj.board.domain.member.dto.AuthorityDto;
 import yj.board.domain.member.dto.MemberDto;
 import yj.board.exception.member.DuplicateMemberException;
+import yj.board.service.ArticleService;
+import yj.board.service.CommentService;
 import yj.board.service.MemberService;
 
 import java.util.HashSet;
@@ -39,6 +41,11 @@ class MemberControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private MemberService memberService;
+    @MockBean
+    private ArticleService articleService;
+    @MockBean
+    private CommentService commentService;
+
 
     @BeforeEach
     void init() {
