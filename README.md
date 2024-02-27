@@ -60,6 +60,12 @@ Seurity Filter단에서 JWT를 처리하는 Custom Filter를 만들고, 만료�
 Access Token 만료시 재발급 요청으로 Refresh Token을 보내고 Access Token 만료 시간을 짧게 가져가서 탈취될 경우를 대비하였습니다.
 DB에 Refresh Token을 저장해서 검증시 오직 하나의 Refresh Token만 유효하도록 구현하였습니다.
 
+**트러블 슈팅 - JWT 토큰 위치**
+
+- 보안상 문제로 Refresh Token의 저장 위치를 Cookie로 변경하였습니다.
+
+[트러블 슈팅 - JWT 토큰 위치 설명 링크](https://yjboard.site/article/14)
+
 ### 소셜 로그인 (Google)
 ![소셜 로그인 시퀀스](https://github.com/ssda332/board/assets/82029665/e5fe0cbb-04ff-4dd6-83e7-cd32c153f5a2)
 
@@ -84,3 +90,6 @@ Google 서버와 통신하여 유저 정보를 가져오고, 해당 정보와 �
 이미지 원본 파일을 저장합니다. 임시 파일은 S3 버킷 내에서 수명 주기 규칙을 주어 일정 시간이
 지나면 삭제돼서 이미지가 사용되지 않는 파일이 계속 쌓이지 않도록 하였습니다.
 
+### **웹 애플리케이션의 도메인 및 보안 설정**
+
+SSL 인증서를 받고 HTTPS 보안 프로토콜을 적용하였습니다. 또한, 도메인은 가비아에서 구매하였고, AWS Route 53을 활용해 해당 도메인과 웹 애플리케이션을 연결하는 작업을 완료하였습니다.
