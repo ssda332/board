@@ -1,4 +1,4 @@
-package yj.board.repository;
+package yj.board.repository.mybatis;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.TestPropertySource;
 import yj.board.domain.article.dto.CategoryDto;
 import yj.board.domain.article.dto.CategoryEditDto;
 import yj.board.repository.mybatis.mapper.CategoryMapper;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @MybatisTest
+//@TestPropertySource(locations = "classpath:application-test.yml")
 public class CategoryRepositoryTest {
     @Autowired
     private CategoryMapper categoryMapper;

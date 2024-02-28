@@ -38,5 +38,6 @@ out/
 
 ### custom ###
 application-oauth.yml
+application-test.yml
 application.yml
 JwtProperties.java

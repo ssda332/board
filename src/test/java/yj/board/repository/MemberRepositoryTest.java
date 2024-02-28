@@ -1,11 +1,10 @@
 package yj.board.repository;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.TestPropertySource;
 import yj.board.domain.member.Authority;
 import yj.board.domain.member.Member;
 
@@ -18,31 +17,10 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestPropertySource(properties = {"spring.config.location = classpath:application-test.yml"})
 public class MemberRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
-
-    @BeforeEach
-    void setUp() {
-        //given
-        Authority authority = Authority.builder()
-                .authorityName("ROLE_USER")
-                .build();
-
-        Member member = Member.builder()
-                .loginId("repoTest13")
-                .password(null)
-                .nickname("repoTest13")
-                .authorities(Collections.singleton(authority))
-                .activated(true)
-                .regDate(LocalDateTime.now())
-                .uptDate(LocalDateTime.now())
-                .build();
-
-        memberRepository.save(member);
-    }
-
 
     @Test
     @DisplayName("회원 정보 DB에 저장하기")
@@ -69,10 +47,8 @@ public class MemberRepositoryTest {
         //when
         Member savedMember = memberRepository.save(member);
 
-//        System.out.println(savedMember.getRegDate());
         //then
         assertThat(member.getLoginId()).isSameAs(savedMember.getLoginId());
-//        assertThat(member.getRegDate()).isSameAs(savedMember.getRegDate());
 
     }
 
@@ -80,7 +56,7 @@ public class MemberRepositoryTest {
     @DisplayName("회원 아이디로 단건 조회하기")
     void selectMemberByLoginId() {
         //given
-        String loginId = "repoTest13";
+        String loginId = "adminTest";
 
         //when
         Optional<Member> member = memberRepository.findOneWithAuthoritiesByLoginId(loginId);

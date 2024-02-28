@@ -34,6 +34,8 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	// h2 테스트용
+	testImplementation 'com.h2database:h2'
 
 	// 코드 리소스 변경시 자동 재시작
 	implementation 'org.springframework.boot:spring-boot-devtools:2.6.2'
