@@ -1,18 +1,62 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+name: CICD Test
+run-name: Running
+on:
+  push:
+    branches:
+      - 2
+      - 'releases/**'
+
+env:
+  AWS_REGION: ap-northeast-2
+  AWS_S3_BUCKET: boardgithubactionbucket
+  AWS_CODE_DEPLOY_APPLICATION: board-cicd
+  AWS_CODE_DEPLOY_GROUP: board-cicd-group
+  RESOURCE_PATH: ./src/main/resources/application-prod.yml
+
 jobs:
-  Explore-GitHub-Actions:
+  build-with-gradle:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: 2 브랜치로 이동
+        uses: actions/checkout@v3
+        with:
+          ref: 2
+      - name: JDK 11 설치
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'corretto'
+      - name: yml secret 변수 설정
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{ env.RESOURCE_PATH }}
+        env:
+          spring.oauth2.client.registration.google.redirect-uri: ${{ secrets.OAUTH2_GOOGLE_URI }}
+          spring.oauth2.client.registration.google.client-id: ${{ secrets.OAUTH2_GOOGLE_ID }}
+          spring.oauth2.client.registration.google.client-secret: ${{ secrets.OAUTH2_GOOGLE_SECRET }}
+          spring.datasource.url: ${{ secrets.DATASOURCE_URL }}
+          spring.datasource.username: ${{ secrets.DATASOURCE_USERNAME }}
+          spring.datasource.password: ${{ secrets.DATASOURCE_PASSWORD }}
+          jwt.secret: ${{ secrets.JWT_SECRET }}
+          server.ssl.key-store: ${{ secrets.SSL_KEY_STORE }}
+          server.ssl.key-store-type: ${{ secrets.SSL_KEY_STORE_TYPE }}
+          server.ssl.key-store-password: ${{ secrets.SSL_KEY_PASSWORD }}
+          cloud.aws.credentials.accessKey: ${{ secrets.AWS_CREDENTIALS_ACCESSKEY }}
+          cloud.aws.credentials.secretKey: ${{ secrets.AWS_CREDENTIALS_SECRETKEY }}
+          cloud.aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET_NAME }}
+          cloud.aws.s3.s3url-temp: ${{ secrets.AWS_S3_BUCKET_URL_TEMP }}
+          cloud.aws.s3.s3url: ${{ secrets.AWS_S3_BUCKET_URL }}
+      - name: gradlew에 실행 권한 부여
+        run: chmod +x ./gradlew
+      - name: 프로젝트 빌드
+        run: ./gradlew clean build -x test
+      - name: AWS credential 설정
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.CICD_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY }}
+      - name: S3에 업로드
+        run: aws deploy push --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --ignore-hidden-files --s3-location s3://$AWS_S3_BUCKET/cicd/$GITHUB_SHA.zip --source .
+#      - name: EC2에 배포
+#        run: aws deploy create-deployment --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} --s3-location bucket=$AWS_S3_BUCKET,key=cicd/$GITHUB_SHA.zip,bundleType=zip
