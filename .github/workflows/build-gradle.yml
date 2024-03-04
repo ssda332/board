@@ -26,16 +26,27 @@ jobs:
         with:
           java-version: '11'
           distribution: 'corretto'
+      - name: 긴 secrets 합치기
+        env:
+          ID_1: ${{ secrets.OAUTH2_GOOGLE_ID_1 }}
+          ID_2: ${{ secrets.OAUTH2_GOOGLE_ID_2 }}
+          DATA_URL_1: ${{ secrets.DATASOURCE_URL_1 }}
+          DATA_URL_2: ${{ secrets.DATASOURCE_URL_2 }}
+        run: |
+          COMBINED_ID="${ID_1},${ID_2}"
+          COMBINED_URL="${DATA_URL_1},${DATA_URL_2}"
+          echo "COMBINED_ID=$COMBINED_ID" >> $GITHUB_ENV
+          echo "COMBINED_URL=$COMBINED_URL" >> $GITHUB_ENV
       - name: yml secret 변수 설정
         uses: microsoft/variable-substitution@v1
         with:
           files: ${{ env.RESOURCE_PATH }}
         env:
           spring.security.oauth2.client.registration.google.redirect-uri: ${{ secrets.OAUTH2_GOOGLE_URI }}
-          spring.security.oauth2.client.registration.google.client-id: ${{ secrets.OAUTH2_GOOGLE_ID }}
+          spring.security.oauth2.client.registration.google.client-id: ${{ env.COMBINED_ID }}
           spring.security.oauth2.client.registration.google.client-secret: ${{ secrets.OAUTH2_GOOGLE_SECRET }}
           spring.security.oauth2.password: ${{ secrets.OAUTH2_PASSWORD }}
-          spring.datasource.url: ${{ secrets.DATASOURCE_URL }}
+          spring.datasource.url: ${{ env.COMBINED_URL }}
           spring.datasource.username: ${{ secrets.DATASOURCE_USERNAME }}
           spring.datasource.password: ${{ secrets.DATASOURCE_PASSWORD }}
           jwt.secret: ${{ secrets.JWT_SECRET }}
