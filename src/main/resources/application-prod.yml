@@ -19,8 +19,6 @@ spring:
               - profile
               - email
       password: ${OAUTH2_PASSWORD}
-  profiles:
-    active: prod
 
   datasource:
     url: ${DATASOURCE_URL}
