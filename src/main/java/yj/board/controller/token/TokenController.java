@@ -2,6 +2,7 @@ package yj.board.controller.token;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +10,7 @@ import yj.board.domain.member.Member;
 import yj.board.domain.member.dto.LoginDto;
 import yj.board.domain.token.dto.ReissueTokenDto;
 import yj.board.domain.token.dto.TokenDto;
-import yj.board.jwt.JwtProperties;
+import yj.board.util.JwtProperties;
 import yj.board.service.TokenService;
 
 import javax.servlet.http.Cookie;
@@ -24,6 +25,9 @@ import javax.validation.Valid;
 public class TokenController {
 
     private final TokenService tokenService;
+
+    @Autowired
+    private JwtProperties jwtProperties;
 
     @GetMapping("/new")
     public String loginForm(@ModelAttribute("member") Member member) {
@@ -43,7 +47,7 @@ public class TokenController {
         String refreshToken = null;
 
         for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals(JwtProperties.REFRESH_HEADER_STRING)) {
+            if (cookie.getName().equals(jwtProperties.getRefreshTokenHeader())) {
                 refreshToken = cookie.getValue();
             }
         }
@@ -60,14 +64,14 @@ public class TokenController {
     }
 
     public void responseTokenDto(String accessToken, String refreshToken, HttpServletResponse response) {
-        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
+        response.addHeader(jwtProperties.getHeader(), accessToken);
         Cookie cookie = getRefreshTokenCookie(refreshToken);
 
         response.addCookie(cookie);
     }
 
-    private static Cookie getRefreshTokenCookie(String refreshToken) {
-        Cookie cookie = new Cookie(JwtProperties.REFRESH_HEADER_STRING, refreshToken);
+    public Cookie getRefreshTokenCookie(String refreshToken) {
+        Cookie cookie = new Cookie(jwtProperties.getRefreshTokenHeader(), refreshToken);
 
         String serverDomain = System.getenv("SERVER_DOMAIN");
         if (!(serverDomain == null || serverDomain.isEmpty())) {
@@ -76,7 +80,7 @@ public class TokenController {
         }
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-        cookie.setMaxAge(JwtProperties.EXPIRATION_TIME_REFRESH / 1000);
+        cookie.setMaxAge(jwtProperties.getRefreshTokenValidityInSeconds());
         return cookie;
     }
 

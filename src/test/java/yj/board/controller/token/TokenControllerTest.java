@@ -17,7 +17,7 @@ import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.token.dto.ReissueTokenDto;
 import yj.board.domain.token.dto.TokenDto;
 import yj.board.exception.member.LoginFailException;
-import yj.board.jwt.JwtProperties;
+import yj.board.util.JwtProperties;
 import yj.board.service.TokenService;
 
 import javax.servlet.http.Cookie;
@@ -46,6 +46,8 @@ class TokenControllerTest {
     public static final String TEST_PW = "testTest1";
     public static final String TEST_ACCESS_TOKEN = "testat";
     public static final String TEST_REFRESH_TOKEN = "testrt";
+    @Autowired
+    private JwtProperties jwtProperties;
 
     @Test
     @DisplayName("로그인 성공")
@@ -63,10 +65,11 @@ class TokenControllerTest {
         //then
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(header().exists(JwtProperties.HEADER_STRING))
-                .andExpect(header().string(JwtProperties.HEADER_STRING, TEST_ACCESS_TOKEN))
-                .andExpect(cookie().exists(JwtProperties.REFRESH_HEADER_STRING))
-                .andExpect(cookie().value(JwtProperties.REFRESH_HEADER_STRING, TEST_REFRESH_TOKEN));
+                .andExpect(header().exists(jwtProperties.getHeader()))
+                .andExpect(header().string(jwtProperties.getHeader(), TEST_ACCESS_TOKEN))
+                .andExpect(cookie().exists(jwtProperties.getRefreshTokenHeader()))
+                .andExpect(cookie().value(jwtProperties.getRefreshTokenHeader(), TEST_REFRESH_TOKEN));
+
     }
 
     @Test
@@ -109,10 +112,10 @@ class TokenControllerTest {
         //then
         actions.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(header().exists(JwtProperties.HEADER_STRING))
-                .andExpect(header().string(JwtProperties.HEADER_STRING, newAccessToken))
-                .andExpect(cookie().exists(JwtProperties.REFRESH_HEADER_STRING))
-                .andExpect(cookie().value(JwtProperties.REFRESH_HEADER_STRING, newRefreshToken))
+                .andExpect(header().exists(jwtProperties.getHeader()))
+                .andExpect(header().string(jwtProperties.getHeader(), newAccessToken))
+                .andExpect(cookie().exists(jwtProperties.getRefreshTokenHeader()))
+                .andExpect(cookie().value(jwtProperties.getRefreshTokenHeader(), newRefreshToken))
                 ;
     }
 
@@ -121,7 +124,7 @@ class TokenControllerTest {
 
         if (method.equals("put")) {
             actions = mockMvc.perform(put(url)
-                    .cookie(new Cookie(JwtProperties.REFRESH_HEADER_STRING, TEST_REFRESH_TOKEN)) // 쿠키 추가
+                    .cookie(new Cookie(jwtProperties.getRefreshTokenHeader(), TEST_REFRESH_TOKEN)) // 쿠키 추가
                     .content(object)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON));

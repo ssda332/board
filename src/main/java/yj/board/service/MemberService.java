@@ -22,11 +22,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    /*public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
-        this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
-    }*/
-
     @Transactional
     public MemberDto signup(MemberDto memberDto) {
         if (memberRepository.findOneWithAuthoritiesByLoginId(memberDto.getLoginId()).orElse(null) != null) {

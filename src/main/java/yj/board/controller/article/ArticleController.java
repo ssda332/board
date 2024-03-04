@@ -2,6 +2,7 @@ package yj.board.controller.article;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import yj.board.domain.article.dto.*;
 import yj.board.domain.file.FileDto;
 import yj.board.domain.search.Search;
-import yj.board.jwt.JwtProperties;
+import yj.board.util.JwtProperties;
 import yj.board.service.ArticleService;
 import yj.board.service.S3Uploader;
 
@@ -28,6 +29,9 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final S3Uploader s3Uploader;
+
+    @Autowired
+    private JwtProperties jwtProperties;
 
     // 카테고리 게시판 이동
     @GetMapping("")
@@ -77,7 +81,7 @@ public class ArticleController {
     }
 
     private void checkWriterAuthority(HttpServletRequest request, String atcNum) {
-        String bearerToken = request.getHeader(JwtProperties.HEADER_STRING);
+        String bearerToken = request.getHeader(jwtProperties.getHeader());
         articleService.checkMember(atcNum, bearerToken);
     }
 

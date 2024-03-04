@@ -18,6 +18,7 @@ spring:
             scope:
               - profile
               - email
+      password: ${OAUTH2_PASSWORD}
   profiles:
     active: prod
 
@@ -51,8 +52,10 @@ logging:
 
 jwt:
   header: Authorization
+  refresh-token-header: RefreshToken
   secret: ${JWT_SECRET}
-  token-validity-in-seconds: 86400
+  token-validity-in-seconds: 600
+  refresh-token-validity-in-seconds: 604800
 
 server:
   port: 8443

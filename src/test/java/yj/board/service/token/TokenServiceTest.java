@@ -104,7 +104,6 @@ class TokenServiceTest {
         TokenDto tokenDto = new TokenDto("testToken", "testToken");
         RefreshToken refreshToken = getRefreshToken(member, tokenDto);
 
-        given(tokenProvider.resolveToken(any())).willReturn("testToken");
         given(tokenProvider.validationToken(any())).willReturn(true);
         given(tokenProvider.getAuthentication(any(String.class))).willReturn(authentication);
         given(memberRepository.findById(any())).willReturn(Optional.of(member));
@@ -142,7 +141,6 @@ class TokenServiceTest {
         @Test
         @DisplayName("user pk로 유저 검색 실패")
         void dbSelectFail() {
-            given(tokenProvider.resolveToken(any())).willReturn("testToken");
             given(tokenProvider.validationToken(any())).willReturn(true);
             given(tokenProvider.getAuthentication(any(String.class))).willReturn(authentication);
             given(memberRepository.findById(any())).willReturn(Optional.ofNullable(null));
@@ -154,7 +152,6 @@ class TokenServiceTest {
         @Test
         @DisplayName("repo 에 저장된 Refresh Token 이 없음")
         void dbSelectFail1() {
-            given(tokenProvider.resolveToken(any())).willReturn("testToken");
             given(tokenProvider.validationToken(any())).willReturn(true);
             given(tokenProvider.getAuthentication(any(String.class))).willReturn(authentication);
             given(memberRepository.findById(any())).willReturn(Optional.of(member));

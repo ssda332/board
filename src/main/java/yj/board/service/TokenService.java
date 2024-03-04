@@ -59,8 +59,8 @@ public class TokenService {
 
     @Transactional
     public ReissueTokenDto reissue(TokenDto tokenDto) {
-        String accessToken = tokenProvider.resolveToken(tokenDto.getAccessToken());
-        String refreshToken = tokenProvider.resolveToken(tokenDto.getRefreshToken());
+        String accessToken = tokenDto.getAccessToken();
+        String refreshToken = tokenDto.getRefreshToken();
 
         if (!tokenProvider.validationToken(refreshToken)) {
             throw new RefreshTokenException();

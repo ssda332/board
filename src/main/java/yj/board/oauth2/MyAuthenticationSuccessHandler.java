@@ -2,6 +2,7 @@ package yj.board.oauth2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -11,9 +12,10 @@ import yj.board.domain.member.dto.AuthorityDto;
 import yj.board.domain.member.dto.LoginDto;
 import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.token.dto.TokenDto;
-import yj.board.jwt.JwtProperties;
+import yj.board.util.JwtProperties;
 import yj.board.service.TokenService;
 import yj.board.service.MemberService;
+import yj.board.util.MyOAuth2Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -32,6 +34,12 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
     private final TokenService tokenService;
     private final MemberService memberService;
 
+    @Autowired
+    private JwtProperties jwtProperties;
+
+    @Autowired
+    private MyOAuth2Properties myOAuth2Properties;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         // OAuth2User로 캐스팅하여 인증된 사용자 정보를 가져온다.
@@ -41,20 +49,20 @@ public class MyAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucce
         boolean isExist = oAuth2User.getAttribute("exist");
         // 인증된 사용자 정보를 memberDto로 파싱한다
         MemberDto memberDto = getMemberDto(oAuth2User);
-        memberDto.setPassword(JwtProperties.oauth2Password);
+        memberDto.setPassword(myOAuth2Properties.getPassword());
 
         if (!isExist) {
             // 회원가입이 되어있지 않을 경우, 자동 회원가입 수행
             memberDto = memberService.signup(memberDto);
         }
 
-        LoginDto loginDto = new LoginDto(memberDto.getLoginId(), JwtProperties.oauth2Password);
+        LoginDto loginDto = new LoginDto(memberDto.getLoginId(), myOAuth2Properties.getPassword());
         TokenDto tokenDto = tokenService.login(loginDto);
 
         String targetUrl = createTargetUrl(tokenDto);
 
         // refresh token 쿠키로 보내기
-        Cookie refreshToken = new Cookie(JwtProperties.REFRESH_HEADER_STRING, tokenDto.getRefreshToken());
+        Cookie refreshToken = new Cookie(jwtProperties.getRefreshTokenHeader(), tokenDto.getRefreshToken());
 
         String serverDomain = System.getenv("SERVER_DOMAIN");
         if (!(serverDomain == null || serverDomain.isEmpty())) {

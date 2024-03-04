@@ -7,18 +7,21 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import yj.board.auth.PrincipalDetails;
+import yj.board.util.JwtProperties;
 import yj.board.domain.member.dto.MemberDto;
 import yj.board.domain.member.dto.MemberInfoDto;
 import yj.board.domain.token.dto.TokenDto;
 import yj.board.domain.member.Member;
 import yj.board.repository.MemberRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,6 +35,9 @@ public class TokenProvider {
 
     private final MemberRepository memberRepository;
 
+    @Autowired
+    private JwtProperties jwtProperties;
+
     // 토큰 생성
     public TokenDto createToken(MemberInfoDto memberInfoDto) {
 
@@ -39,21 +45,31 @@ public class TokenProvider {
                 .withSubject(memberInfoDto.getLoginId())
                 .withClaim("nickname", memberInfoDto.getNickname())
                 .withClaim("memId", memberInfoDto.getId())
-                .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+                .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getTokenValidityInSeconds() * 1000))
+                .sign(Algorithm.HMAC512(jwtProperties.getSecret()));
 
         String refreshToken = JWT.create()
                 .withSubject(memberInfoDto.getLoginId())
                 .withClaim("memId", memberInfoDto.getId())
-                .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME_REFRESH))
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getRefreshTokenValidityInSeconds() * 1000))
+                .sign(Algorithm.HMAC512(jwtProperties.getSecret()));
 
         return new TokenDto(accessToken, refreshToken);
     }
 
-    public String resolveToken(String token) {
+    /*public String resolveToken(String token) {
         if (token != null && !token.equals("null") && !token.equals("Bearer null")) {
-            token = token.replace(JwtProperties.TOKEN_PREFIX, "");
+//            token = token.replace(JwtProperties.TOKEN_PREFIX, "");
+            return token;
+        }
+
+        return null;
+    }*/
+    public String resolveToken(HttpServletRequest request) {
+        String token = request.getHeader(jwtProperties.getHeader());
+
+        if (token != null && !token.equals("null") && !token.equals("Bearer null")) {
+//            token = token.replace(JwtProperties.TOKEN_PREFIX, "");
             return token;
         }
 
@@ -99,7 +115,7 @@ public class TokenProvider {
 
     public DecodedJWT decodedJWT(String token) {
         try {
-            DecodedJWT verify = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token);
+            DecodedJWT verify = JWT.require(Algorithm.HMAC512(jwtProperties.getSecret())).build().verify(token);
 
             return verify;
         } catch (JWTVerificationException e) {
@@ -115,7 +131,7 @@ public class TokenProvider {
 
     public boolean validationToken(String token) {
         try {
-            DecodedJWT verify = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token);
+            DecodedJWT verify = JWT.require(Algorithm.HMAC512(jwtProperties.getSecret())).build().verify(token);
             return true;
         } catch (TokenExpiredException e) {
             log.error("토큰 검증 실패 - 만료 TokenExpiredException");
@@ -126,8 +142,8 @@ public class TokenProvider {
     }
 
     public String getMemberPk(String bearerToken) {
-        String token = resolveToken(bearerToken);
-        String memId = decodedJWT(token).getClaim("memId").toString();
+//        String token = resolveToken(bearerToken);
+        String memId = decodedJWT(bearerToken).getClaim("memId").toString();
 
         return memId;
     }

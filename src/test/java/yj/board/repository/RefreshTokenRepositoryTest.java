@@ -11,7 +11,7 @@ import org.springframework.test.context.TestPropertySource;
 import yj.board.domain.member.Authority;
 import yj.board.domain.member.Member;
 import yj.board.domain.token.RefreshToken;
-import yj.board.jwt.JwtProperties;
+import yj.board.util.JwtProperties;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -28,6 +28,9 @@ class RefreshTokenRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private JwtProperties jwtProperties;
 
     @Test
     @DisplayName("리프레쉬 토큰 저장하기")
@@ -51,8 +54,8 @@ class RefreshTokenRepositoryTest {
 
         String refreshToken = JWT.create()
                 .withSubject(savedMember.getLoginId())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ JwtProperties.EXPIRATION_TIME_REFRESH))
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getRefreshTokenValidityInSeconds()))
+                .sign(Algorithm.HMAC512(jwtProperties.getSecret()));
 
         RefreshToken token = RefreshToken.builder()
                 .memId(savedMember.getId())

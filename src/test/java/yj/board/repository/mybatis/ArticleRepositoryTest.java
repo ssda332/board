@@ -14,7 +14,7 @@ import yj.board.repository.mybatis.mapper.CategoryMapper;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @MybatisTest
-@TestPropertySource(locations = "classpath:application-test.yml")
+//@TestPropertySource(locations = "classpath:application-test.yml")
 public class ArticleRepositoryTest {
     @Autowired
     private CategoryMapper categoryMapper;
