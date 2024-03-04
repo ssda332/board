@@ -31,10 +31,10 @@ jobs:
         with:
           files: ${{ env.RESOURCE_PATH }}
         env:
-          spring.oauth2.client.registration.google.redirect-uri: ${{ secrets.OAUTH2_GOOGLE_URI }}
-          spring.oauth2.client.registration.google.client-id: ${{ secrets.OAUTH2_GOOGLE_ID }}
-          spring.oauth2.client.registration.google.client-secret: ${{ secrets.OAUTH2_GOOGLE_SECRET }}
-          spring.oauth2.client.password: ${{ secrets.OAUTH2_PASSWORD }}
+          spring.security.oauth2.client.registration.google.redirect-uri: ${{ secrets.OAUTH2_GOOGLE_URI }}
+          spring.security.oauth2.client.registration.google.client-id: ${{ secrets.OAUTH2_GOOGLE_ID }}
+          spring.security.oauth2.client.registration.google.client-secret: ${{ secrets.OAUTH2_GOOGLE_SECRET }}
+          spring.security.oauth2.password: ${{ secrets.OAUTH2_PASSWORD }}
           spring.datasource.url: ${{ secrets.DATASOURCE_URL }}
           spring.datasource.username: ${{ secrets.DATASOURCE_USERNAME }}
           spring.datasource.password: ${{ secrets.DATASOURCE_PASSWORD }}
