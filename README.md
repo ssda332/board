@@ -16,12 +16,14 @@ Link : https://yjboard.site
 - Jquery
 
 ### DB
-- Oracle
+- Oracle Database 19c
 
 ### Infra
 - AWS EC2
 - AWS S3
 - AWS Route53
+- AWS CodeDeploy
+- Github Actions
 - Oracle Cloud Database
 
 * * *
@@ -30,6 +32,7 @@ Link : https://yjboard.site
 - Spring Security와 JWT을 이용한 인증/인가 처리
 - REST 기반의 서비스 API 구현
 - Junit5 기반 단위 테스트 구현
+- GitHub Actions, AWS CodeDeploy를 활용한 CI/CD 구현
 
 * * *
 ## 기능
@@ -40,7 +43,8 @@ Link : https://yjboard.site
 * * *
 ## 시스템 아키텍처
 
-![시스템 아키텍쳐](https://github.com/ssda332/board/assets/82029665/2c6c8a37-6e7c-40f2-95fa-f2b126faff29)
+![system architecture](https://github.com/ssda332/board/assets/82029665/5d80bd89-0a00-4ab6-b736-57336655a0b0)
+
 
 
 * * *
@@ -48,6 +52,28 @@ Link : https://yjboard.site
 ![스크린샷 2024-02-10 195027](https://github.com/ssda332/board/assets/82029665/3839310a-7cfe-4503-bbec-c2565ca4057f)
 
 * * *
+## 변경 사항
+### CI/CD
+빌드 및 배포 자동화를 Github Actions와 AWS CodeDeploy, S3를 이용해 구현하였습니다.  
+원격 저장소인 Github에 코드 변경사항을 브랜치에 push하는 이벤트가 발생하면 워크플로우가 발생합니다.
+서버(runner)에서 워크플로우를 실행해 빌드 후 S3에 업로드, 그리고 업로드된 빌드 파일을 AWS CodeDeploy를 사용하여 배포합니다.
+설정정보 민감한 내용 처리를 위해 개발환경에 따른 설정정보 파일를 분리하였습니다.
+
+[[CI/CD 관련 자세한 내용]](https://yjboard.site/article/16)
+
+[[워크플로우 파일]](https://github.com/ssda332/board/blob/2/.github/workflows/build-gradle.yml)  
+[[appspec.yml 파일]](https://github.com/ssda332/board/blob/2/appspec.yml)  
+[[빌드 스크립트 파일]](https://github.com/ssda332/board/tree/2/scripts)
+
+![image](https://github.com/ssda332/board/assets/82029665/7d2ad7ac-d5a8-467d-aa1e-91cc86535694)
+![image](https://github.com/ssda332/board/assets/82029665/c1cea2e3-a502-4431-ba08-b6f9c7c1bc55)
+
+### **트러블 슈팅 - JWT 토큰 위치**
+
+- 보안상 문제로 Refresh Token의 저장 위치를 Cookie로 변경하였습니다.
+
+[트러블 슈팅 - JWT 토큰 위치 설명 링크](https://yjboard.site/article/14)
+
 ## 핵심 기능 설명
 ### Spring Security와 JWT을 이용한 인증/인가 처리
 
@@ -59,12 +85,6 @@ Seurity Filter단에서 JWT를 처리하는 Custom Filter를 만들고, 만료�
 
 Access Token 만료시 재발급 요청으로 Refresh Token을 보내고 Access Token 만료 시간을 짧게 가져가서 탈취될 경우를 대비하였습니다.
 DB에 Refresh Token을 저장해서 검증시 오직 하나의 Refresh Token만 유효하도록 구현하였습니다.
-
-**트러블 슈팅 - JWT 토큰 위치**
-
-- 보안상 문제로 Refresh Token의 저장 위치를 Cookie로 변경하였습니다.
-
-[트러블 슈팅 - JWT 토큰 위치 설명 링크](https://yjboard.site/article/14)
 
 ### 소셜 로그인 (Google)
 ![소셜 로그인 시퀀스](https://github.com/ssda332/board/assets/82029665/e5fe0cbb-04ff-4dd6-83e7-cd32c153f5a2)
@@ -93,3 +113,4 @@ Google 서버와 통신하여 유저 정보를 가져오고, 해당 정보와 �
 ### **웹 애플리케이션의 도메인 및 보안 설정**
 
 SSL 인증서를 받고 HTTPS 보안 프로토콜을 적용하였습니다. 또한, 도메인은 가비아에서 구매하였고, AWS Route 53을 활용해 해당 도메인과 웹 애플리케이션을 연결하는 작업을 완료하였습니다.
+
