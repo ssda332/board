@@ -350,7 +350,7 @@
                 // 권한 검색
                 tokenToJson("GET", "/category", null, true,
                     function(data, status, xhr) {
-                        console.log(data);
+                        // console.log(data);
                         $('html').html(data);
                     },
 
@@ -363,8 +363,8 @@
             // 권한 검색
             tokenToJson("GET", "/members/member", null, true,
                 function(data, status, xhr) {
-                    console.log("/members/member");
-                    console.log(data.authorityDtoSet);
+                    // console.log("/members/member");
+                    // console.log(data.authorityDtoSet);
                     //var authorityDtoSet = data.authorityDtoSet;
                     // ADMIN 권한일때
                     if (hasRoleAdmin(data.authorityDtoSet)) {
@@ -389,6 +389,7 @@
 
                 function(xhr, status, error) {
                     $("#anonymous").show();
+                    console.log("권한 인증 실패");
                 }
             );
 

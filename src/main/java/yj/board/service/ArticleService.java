@@ -49,10 +49,6 @@ public class ArticleService {
 
     @Transactional(readOnly = true)
     public Integer selectArticleCount(String seq, Search search) {
-        if (search.getSearchValue() != null && search.getSearchCondition() != null) {
-
-        }
-
         return articleRepository.selectArticleCount(seq, search);
     }
 
@@ -96,6 +92,7 @@ public class ArticleService {
 
         ArticleDetailDto article = articleRepository.findArticle(atcNum);
 
+        // 수정에 필요한 content는 false(마크다운 형식의 content), 상세보기에 필요한 content는 true(html 형식의 content)
         if (markToHtml) {
             article.setAtcContent(markToHtml(article.getAtcContent()));
         }
