@@ -97,19 +97,13 @@ public class WebSecurityConfig {
                 .antMatchers(HttpMethod.PUT, "/category/list")
                 .access("hasRole('ROLE_ADMIN')")
 
-                /*.antMatchers("/category/list").permitAll()
-                .antMatchers("/category/**")
-                .access("hasRole('ROLE_ADMIN')")*/
-                /*.antMatchers("/api/**")
-                .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
-                .anyRequest().permitAll();*/
                 .anyRequest().permitAll()
                 .and()
 
+                /**
+                 * 소셜 로그인 설정
+                 */
                 .oauth2Login()
-                /*.redirectionEndpoint()
-                .baseUri("/")
-                .and()*/
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService)
                 .and()
