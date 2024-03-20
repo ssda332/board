@@ -7,8 +7,6 @@ import yj.board.domain.article.dto.CategoryEditDto;
 import java.util.ArrayList;
 
 public interface CategoryRepository {
-
-    Category save(Category category);
     ArrayList<CategoryDto> findAll();
     ArrayList<CategoryDto> findCanWrite();
     ArrayList<CategoryEditDto> findAll_edit();

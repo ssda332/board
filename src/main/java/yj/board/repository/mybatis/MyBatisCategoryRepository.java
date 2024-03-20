@@ -17,11 +17,6 @@ public class MyBatisCategoryRepository implements CategoryRepository {
     private final CategoryMapper categoryMapper;
 
     @Override
-    public Category save(Category category) {
-        return null;
-    }
-
-    @Override
     public ArrayList<CategoryDto> findAll() {
         return categoryMapper.findAll();
     }

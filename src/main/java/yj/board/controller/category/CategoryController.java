@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import yj.board.domain.article.dto.CategoryDto;
+import yj.board.domain.article.Category;
 import yj.board.domain.article.dto.CategoryEditDto;
 import yj.board.service.CategoryService;
 
