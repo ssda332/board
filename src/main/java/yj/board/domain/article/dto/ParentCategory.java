@@ -9,25 +9,19 @@ import yj.board.domain.article.Category;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class CategoryDto {
+public class ParentCategory {
     private String ctgId;
     private String ctgTitle;
     private Long ctgHierachy;
-//    private String ctgRegDate; // 데이터 타입 변경
-//    private String ctgUptDate; // 데이터 타입 변경
-    private Long ctgSort;
-    private String ctgPrtId;
 
-    /*public static CategoryDto from(CategoryEditDto category) {
+    public static ParentCategory from(Category category) {
         if (category == null) return null;
 
-        return CategoryDto.builder()
+        return ParentCategory.builder()
                 .ctgId(category.getCtgId())
                 .ctgTitle(category.getCtgTitle())
                 .ctgHierachy(category.getCtgHierachy())
-                .ctgSort(category.getCtgSort())
-                .ctgPrtId(category.getCtgPrtId())
                 .build();
-    }*/
 
+    }
 }

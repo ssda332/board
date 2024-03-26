@@ -10,6 +10,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import yj.board.domain.article.dto.CategoryEditDto;
 import yj.board.repository.CategoryRepository;
+import yj.board.repository.MybatisCategoryRepository;
 import yj.board.service.CategoryService;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class CategoryServiceTest {
     CategoryService categoryService;
 
     @Mock
-    CategoryRepository categoryRepository;
+    MybatisCategoryRepository categoryRepository;
 
     private Long ctgSeq = 0L;
 

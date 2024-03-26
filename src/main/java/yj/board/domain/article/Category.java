@@ -17,6 +17,7 @@ import java.util.List;
 @Table(name = "TB_ARTICLE_CTG")
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @SequenceGenerator(
@@ -35,9 +36,9 @@ public class Category {
 
     @Column(name="CTG_TITLE")
     private String ctgTitle;
-/*
+
     @Column(name="CTG_HIERACHY")
-    private Long ctgHierachy;*/
+    private Long ctgHierachy;
 
     @Column(name = "CTG_REG_DATE", nullable = false, updatable = false)
     @CreatedDate
@@ -51,11 +52,11 @@ public class Category {
     private Long ctgSort;
 
     // 셀프조인
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CTG_PRT_ID")
     private Category parents;
 
-    @OneToMany(mappedBy = "parents")
+    @OneToMany(mappedBy = "parents", fetch = FetchType.EAGER)
     private List<Category> child = new ArrayList<>();
 
 }

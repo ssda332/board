@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
-import yj.board.domain.article.Category;
-import yj.board.repository.CategoryRepository;
+import yj.board.domain.article.Article;
 
 import java.util.List;
 
@@ -14,21 +13,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @TestPropertySource(properties = {"spring.config.location = classpath:application-test.yml"})
-class JpaCategoryRepositoryTest {
+public class JpaArticleRepositoryTest {
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private JpaArticleRepository articleRepository;
 
     @Test
-    @DisplayName("계층별 카테고리 조회")
-    void 계층별_카테고리_조회() {
-        List<Category> categories = categoryRepository.findTopCategories();
+    @DisplayName("모든 게시글 조회")
+    void findAll() {
+        List<Article> articles = articleRepository.findAll();
 
-        assertThat(categories).isNotEmpty();
-    }
-
-    @Test
-    void findByParentId() {
-
+        assertThat(articles).isNotEmpty();
     }
 }

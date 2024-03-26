@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import yj.board.domain.article.dto.CategoryDto;
 import yj.board.domain.article.Category;
+import yj.board.domain.article.dto.CategoryDtoJpa;
 import yj.board.domain.article.dto.CategoryEditDto;
 import yj.board.service.CategoryService;
 
@@ -47,4 +49,11 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.saveCategory(data));
     }
 
+    @Transactional
+    @GetMapping("jpa")
+    public ResponseEntity<List<CategoryDtoJpa>> findTopCategories() {
+        List<CategoryDtoJpa> topCategories = categoryService.findTopCategories();
+
+        return ResponseEntity.ok(topCategories);
+    }
 }

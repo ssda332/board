@@ -1,18 +1,18 @@
 package yj.board.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import yj.board.domain.article.Category;
-import yj.board.domain.article.dto.CategoryDto;
-import yj.board.domain.article.dto.CategoryEditDto;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public interface CategoryRepository {
-    ArrayList<CategoryDto> findAll();
-    ArrayList<CategoryDto> findCanWrite();
-    ArrayList<CategoryEditDto> findAll_edit();
+public interface CategoryRepository extends JpaRepository<Category, Long> {
+    @Query("SELECT c FROM Category c WHERE c.parents IS NULL ORDER BY c.ctgSort")
+    List<Category> findTopCategories();
 
-    long selectNewCtgId();
-    void insertCategory(CategoryEditDto category);
-    void updateCategory(CategoryEditDto category);
-    void deleteCategory(CategoryEditDto category);
+    @Query("SELECT c FROM Category c WHERE c.parents.ctgId = :parentId ORDER BY c.ctgSort")
+    List<Category> findByParentId(@Param("parentId") Long parentId);
 }

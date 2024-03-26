@@ -49,7 +49,6 @@ function tokenToJson(type, url, data, isToken, callbackSuccess, callbackError) {
     }).fail(function(xhr, status, error) {
         let jsonResponse = JSON.parse(xhr.responseText);
         let accessToken = localStorage.getItem("Authorization");
-        console.log(accessToken);
 
         if (jsonResponse.code == "AU_001" && accessToken != null) {
             // 401 시큐리티 인증 실패 에러

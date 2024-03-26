@@ -1,3 +1,51 @@
+function category_hireachy_jpa(categoryList) {
+    let html = "";
+
+    categoryList.forEach(function(category) {
+        html += '<hr class="sidebar-divider">';
+        html += '<div class="sidebar-heading">' + category.ctgTitle + '</div>';
+
+        category.child.forEach(function(childCategory) {
+            if (childCategory.child.length > 0) {
+                html += '<li class="nav-item">';
+                html += '<a class="nav-link collapsed" href="/' + childCategory.ctgId + '" data-toggle="collapse" data-target="#collapsePages' + childCategory.ctgId + '"';
+                html += ' aria-expanded="true" aria-controls="collapsePages' + childCategory.ctgId + '">';
+                html += '<i class="fas fa-fw fa-folder"></i>';
+                html += '<span>' + childCategory.ctgTitle + '</span>';
+                html += '</a>';
+
+                html += '<div id="collapsePages' + childCategory.ctgId + '" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">';
+                html += '<div class="bg-white py-2 collapse-inner rounded">';
+
+                childCategory.child.forEach(function(childChildCategory) {
+                    html += '<a class="collapse-item" href="/article?category=' + childChildCategory.ctgId + '&ctgTitle=' + childChildCategory.ctgTitle + '">' + childChildCategory.ctgTitle + '</a>';
+                });
+
+                html += '</div></div></li>';
+            } else {
+                html += '<li class="nav-item">';
+                html += '<a class="nav-link" href="/article?category=' + childCategory.ctgId + '&ctgTitle=' + childCategory.ctgTitle + '">';
+                html += '<i class="fas fa-fw fa-table"></i>';
+                html += '<span>' + childCategory.ctgTitle + '</span></a></li>';
+            }
+        });
+    });
+
+    return html;
+}
+
+function renderEditCategory_jpa(data, ulElement) {
+    ulElement.innerHTML = ''; // ul 비우기
+
+    // JSON 데이터를 순회하며 li 요소를 동적으로 생성 및 추가
+    data.forEach((item, index) => {
+
+        const liElement = createCategoryListItem_jpa(item);
+        ulElement.appendChild(liElement);
+
+    });
+}
+
 /**
  *  레이아웃 카테고리 렌더링
  */
@@ -57,7 +105,7 @@ function renderEditCategory(data, ulElement) {
     data.forEach((item, index) => {
 
         const liElement = createCategoryListItem(item.ctgTitle, item.ctgPrtTitle, item.ctgId, item.ctgPrtId, "", item.ctgSort, item.ctgHierachy);
-
+        console.log(liElement);
         if (item.ctgPrtId !== null) {
             // ctgPrtId가 null이 아닌 경우 해당 부모 div 아래에 추가
             const wrapperDiv = ulElement.querySelector(`div#wrapper_${item.ctgPrtId}`);
@@ -229,6 +277,192 @@ function createCategoryListItem(ctgTitle, ctgPrtTitle, ctgId, ctgPrtId, status, 
 
     liElement.appendChild(divContainer);
     liElement.appendChild(actionButtonsDiv);
+
+    return divWrapper;
+}
+
+// 카테고리 편집 -> 새로운 카테고리 요소를 생성하는 함수
+function createCategoryListItem_jpa(item) {
+    // item.ctgTitle, ctgPrtTitle, item.ctgId, ctgPrtId, "", item.ctgSort, item.ctgHierachy, item.child
+    let ctgTitle = item.ctgTitle;
+    let ctgPrtTitle = item.parent ? item.parent.ctgTitle : null;
+    let ctgId = item.ctgId;
+    let ctgPrtId = item.parent ? item.parent.ctgId : null;
+    let status = "";
+    let sort = item.ctgSort;
+    let ctgHierachy = item.ctgHierachy;
+    let child = item.child;
+
+    const divWrapper = document.createElement("div"); // li 요소를 감실 div 엘리먼트
+    divWrapper.className = "category-wrapper";
+    divWrapper.id = `wrapper_${ctgId}`; // ul 내 li 요소의 개수를 세어 순서를 매김
+
+    const liElement = document.createElement("li");
+    liElement.className = "list-group-item d-flex justify-content-between align-items-center";
+    liElement.id = `category_li_${ulElement.childElementCount + 1}`; // ul 내 li 요소의 개수를 세어 순서를 매김
+
+    const divContainer = document.createElement("div");
+    divContainer.className = "action-buttons d-flex align-items-center";
+
+    // ctgId
+    const ctgIdDiv = document.createElement("div");
+    ctgIdDiv.id = `ctgId_${ulElement.childElementCount + 1}`; // 중복되지 않는 ID 설정
+    ctgIdDiv.style.display = "none";
+    ctgIdDiv.textContent = ctgId; // 새로운 li의 ctgId 초기값
+
+    // ctgPrtId
+    const ctgPrtIdDiv = document.createElement("div");
+    ctgPrtIdDiv.id = `ctgPrtId_${ulElement.childElementCount + 1}`; // 중복되지 않는 ID 설정
+    ctgPrtIdDiv.style.display = "none";
+    ctgPrtIdDiv.textContent = ctgPrtId; // 새로운 li의 ctgPrtId 초기값
+
+    // status
+    const statusDiv = document.createElement("div");
+    statusDiv.id = `status_${ulElement.childElementCount + 1}`; // 중복되지 않는 ID 설정
+    statusDiv.style.display = "none";
+    statusDiv.textContent = status; // li 상태 표시 (변경 : u, 추가 : c, 삭제 : d)
+
+    // status
+    const sortDiv = document.createElement("div");
+    sortDiv.id = `sort_${ulElement.childElementCount + 1}`; // 중복되지 않는 ID 설정
+    sortDiv.style.display = "none";
+    sortDiv.textContent = sort;
+
+    // status
+    const hierachyDiv = document.createElement("div");
+    hierachyDiv.id = `hierachy_${ulElement.childElementCount + 1}`; // 중복되지 않는 ID 설정
+    hierachyDiv.style.display = "none";
+    hierachyDiv.textContent = ctgHierachy;
+
+    // ctgPrtTitle
+    if (ctgPrtTitle) {
+        const ctgPrtTitleBadge = document.createElement("div");
+        ctgPrtTitleBadge.className = "badge bg-primary mr-2 text-white";
+        ctgPrtTitleBadge.textContent = ctgPrtTitle;
+
+        // Calculate and add margin based on ctgHierachy
+        if (ctgHierachy >= 2) {
+            const marginPx = ctgHierachy * 20 - 20; // Adjust the multiplier as needed
+            ctgPrtTitleBadge.style.marginLeft = `${marginPx}px`;
+        }
+
+        divContainer.appendChild(ctgPrtTitleBadge);
+    }
+
+    // ctgTitle
+    const ctgTitleDiv = document.createElement("div");
+    ctgTitleDiv.id = `ctgTitle_${ulElement.childElementCount + 1}`; // 중복되지 않는 ID 설정
+    ctgTitleDiv.textContent = ctgTitle;
+
+    const actionButtonsDiv = document.createElement("div");
+    actionButtonsDiv.className = "action-buttons";
+
+    // "추가" 버튼 (계층이 3일때는 제거)
+    if (ctgHierachy != 3) {
+        const addButton = document.createElement("button");
+        addButton.type = "button";
+        addButton.className = "btn btn-outline-dark mx-2";
+        addButton.textContent = "추가";
+
+        // "추가" 버튼에 클릭 이벤트 리스너 추가
+        addButton.addEventListener("click", function () {
+            // 알림창을 사용자에게 표시하여 카테고리명 입력 받음
+            const newCategoryTitle = prompt("새로운 카테고리명을 입력하세요:", "기본값");
+
+            // 사용자가 취소 버튼을 누르지 않았고, 카테고리명이 비어 있지 않다면
+            if (newCategoryTitle !== null && newCategoryTitle.trim() !== "") {
+                // 이벤트 핸들러 함수에서 현재 "추가" 버튼이 속한 <li> 요소를 찾습니다.
+                const liElement = addButton.closest("li");
+                const divElement = liElement.closest("div");
+
+                // liElement를 기반으로 객체를 만듭니다.
+                const categoryObject = {
+                    ctgId: liElement.querySelector("[id^=ctgId_]").textContent,
+                    ctgTitle: newCategoryTitle,
+                    parent: {
+                        ctgId: liElement.querySelector("[id^=ctgPrtId_]").textContent,
+                        ctgTitle: liElement.querySelector("[id^=ctgTitle_]").textContent,
+                        ctgHierachy: ctgHierachy
+                    },
+                    ctgHierachy: ctgHierachy + 1,
+                    ctgSort: divElement.children.length,
+                    child: []
+                };
+
+                const newSubCategory = createCategoryListItem_jpa(categoryObject);
+                divElement.appendChild(newSubCategory);
+            }
+        });
+
+        actionButtonsDiv.appendChild(addButton);
+
+    }
+
+    // "삭제" 버튼
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "btn btn-outline-danger mx-2";
+    deleteButton.textContent = "삭제";
+    deleteButton.addEventListener("click", function () {
+        let liElement = deleteButton.closest("li");
+        let statusDiv = liElement.querySelector("[id^=status_]");
+        let status = liElement.querySelector("[id^=status_]").textContent;
+        const ctgId = liElement.querySelector("[id^=ctgId_]").textContent;
+
+        // ul 안의 li 컴포넌트를 반복
+        const liElements = ulElement.querySelectorAll("li");
+        let canDelete = true; // 삭제 가능 여부
+
+        for (const otherLiElement of liElements) {
+            if (otherLiElement !== liElement) { // 현재 li 컴포넌트는 제외
+                const ctgPrtId = otherLiElement.querySelector("[id^=ctgPrtId_]").textContent;
+
+                if (ctgPrtId === ctgId) {
+                    // 삭제를 막고 알림을 표시
+                    alert("다른 카테고리가 해당 카테고리에 속해 있어 삭제할 수 없습니다.");
+                    canDelete = false;
+                    break;
+                }
+            }
+        }
+
+        if (!canDelete) return;
+
+        if (status === "c") {
+            liElement.remove();
+        } else if (status === "u"){
+            alert("변경중인 카테고리는 삭제할 수 없습니다.");
+        } else {
+            deleteButton.classList.add("active");
+            statusDiv.textContent = "d";
+        }
+    });
+
+
+    // 요소들을 구조에 추가
+    divContainer.appendChild(ctgIdDiv);
+    divContainer.appendChild(ctgPrtIdDiv);
+    divContainer.appendChild(statusDiv);
+    divContainer.appendChild(sortDiv);
+    divContainer.appendChild(hierachyDiv);
+
+    divContainer.appendChild(ctgTitleDiv);
+
+    // 추가 버튼 추가는 위에있음
+    actionButtonsDiv.appendChild(deleteButton);
+
+    divWrapper.appendChild(liElement); // divWrapper를 liElement에 추가
+
+    liElement.appendChild(divContainer);
+    liElement.appendChild(actionButtonsDiv);
+
+    if (child !== undefined) {
+        child.forEach(function(childCategory) {
+            let childElement = createCategoryListItem_jpa(childCategory);
+
+            divWrapper.appendChild(childElement);
+        });
+    }
 
     return divWrapper;
 }

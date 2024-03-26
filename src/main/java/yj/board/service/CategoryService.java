@@ -5,38 +5,54 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import yj.board.domain.article.Category;
 import yj.board.domain.article.dto.CategoryDto;
+import yj.board.domain.article.dto.CategoryDtoJpa;
 import yj.board.domain.article.dto.CategoryEditDto;
 import yj.board.repository.CategoryRepository;
+import yj.board.repository.MybatisCategoryRepository;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
 
-    @Qualifier("myBatisCategoryRepository")
+    @Qualifier("myBatisCategoryRepositoryImpl")
+    private final MybatisCategoryRepository mybatisCategoryRepository;
     private final CategoryRepository categoryRepository;
+
+    @Transactional(readOnly = true)
+    public List<CategoryDtoJpa> findTopCategories() {
+        List<Category> topCategories = categoryRepository.findTopCategories();
+
+        List<CategoryDtoJpa> result = topCategories.stream()
+                .map(CategoryDtoJpa::from)
+                .collect(Collectors.toList());
+
+        return result;
+    }
 
     @Transactional(readOnly = true)
     public ArrayList<CategoryDto> findCategory(int type) {
 
         if (type == 1) {
-            return categoryRepository.findAll();
+            return mybatisCategoryRepository.findAllCategories();
         } else if (type == 2) {
-            return categoryRepository.findCanWrite();
+            return mybatisCategoryRepository.findCanWrite();
         } else {
-            return categoryRepository.findAll();
+            return mybatisCategoryRepository.findAllCategories();
         }
 
     }
 
     @Transactional(readOnly = true)
     public ArrayList<CategoryEditDto> findAll_edit() {
-        return categoryRepository.findAll_edit();
+        return mybatisCategoryRepository.findAll_edit();
     }
 
     @Transactional
@@ -53,18 +69,18 @@ public class CategoryService {
                 // 2. new_xx와 같은 id,prtid값 update
                 // 3. insert table
                 String fakeId = category.getCtgId();
-                long newCtgId = categoryRepository.selectNewCtgId();
+                long newCtgId = mybatisCategoryRepository.selectNewCtgId();
                 mapId.put(fakeId, newCtgId);
 
                 // 부모 카테고리가 만들어졌으면 부모 카테고리ID 업데이트
                 if (mapId.containsKey(category.getCtgPrtId())) category.setCtgPrtId(mapId.get(category.getCtgPrtId()) + "");
                 category.setCtgId(Long.toString(newCtgId));
-                categoryRepository.insertCategory(category);
+                mybatisCategoryRepository.insertCategory(category);
 
             } else if (category.getStatus().equals("u")) {
-                categoryRepository.updateCategory(category);
+                mybatisCategoryRepository.updateCategory(category);
             } else if (category.getStatus().equals("d")) {
-                categoryRepository.deleteCategory(category);
+                mybatisCategoryRepository.deleteCategory(category);
             }
         }
 

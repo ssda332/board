@@ -9,7 +9,7 @@ import java.util.ArrayList;
 @Mapper
 public interface CategoryMapper {
 
-    ArrayList<CategoryDto> findAll();
+    ArrayList<CategoryDto> findAllCategories();
     ArrayList<CategoryDto> findCanWrite();
     ArrayList<CategoryEditDto> findAll_edit();
     void insertCategory(CategoryEditDto categoryEditDto);
