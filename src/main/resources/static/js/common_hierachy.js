@@ -288,7 +288,7 @@ function createCategoryListItem_jpa(item) {
     let ctgPrtTitle = item.parent ? item.parent.ctgTitle : null;
     let ctgId = item.ctgId;
     let ctgPrtId = item.parent ? item.parent.ctgId : null;
-    let status = "";
+    let status = item.status !== undefined ? item.status : "";
     let sort = item.ctgSort;
     let ctgHierachy = item.ctgHierachy;
     let child = item.child;
@@ -377,15 +377,16 @@ function createCategoryListItem_jpa(item) {
 
                 // liElement를 기반으로 객체를 만듭니다.
                 const categoryObject = {
-                    ctgId: liElement.querySelector("[id^=ctgId_]").textContent,
+                    ctgId: countNewCtgId(),
                     ctgTitle: newCategoryTitle,
                     parent: {
-                        ctgId: liElement.querySelector("[id^=ctgPrtId_]").textContent,
+                        ctgId: liElement.querySelector("[id^=ctgId_]").textContent,
                         ctgTitle: liElement.querySelector("[id^=ctgTitle_]").textContent,
                         ctgHierachy: ctgHierachy
                     },
                     ctgHierachy: ctgHierachy + 1,
                     ctgSort: divElement.children.length,
+                    status: 'c',
                     child: []
                 };
 

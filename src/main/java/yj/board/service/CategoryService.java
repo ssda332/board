@@ -12,6 +12,7 @@ import yj.board.domain.article.dto.CategoryEditDto;
 import yj.board.repository.CategoryRepository;
 import yj.board.repository.MybatisCategoryRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,7 +35,107 @@ public class CategoryService {
                 .map(CategoryDtoJpa::from)
                 .collect(Collectors.toList());
 
+        result.forEach(parent -> {
+            filterActiveCategories(parent);
+        });
+
         return result;
+    }
+
+    public void filterActiveCategories(CategoryDtoJpa category) {
+        List<CategoryDtoJpa> activeChildren = new ArrayList<>();
+        for (CategoryDtoJpa child : category.getChild()) {
+            if (child.getCtgActivated() == 0) {
+                filterActiveCategories(child); // 재귀적으로 자식 처리
+                activeChildren.add(child);
+            }
+        }
+        category.setChild(activeChildren);
+    }
+
+    @Transactional
+    public ArrayList<CategoryEditDto> saveCategory_jpa(List<CategoryEditDto> dtos) {
+        ArrayList<CategoryEditDto> resultDtos = new ArrayList<>();
+        Map<String, Category> tempIdToCategoryMap = new HashMap<>();
+
+        for (CategoryEditDto dto : dtos) {
+            switch (dto.getStatus()) {
+                case "c":
+                    String ctgPrtId = dto.getCtgPrtId();
+                    if (tempIdToCategoryMap.containsKey(ctgPrtId)) {
+                        // 실제 부모의 ID값 set
+                        dto.setCtgPrtId(Long.toString(tempIdToCategoryMap.get(ctgPrtId).getCtgId()));
+                    }
+
+                    Category addCategory = addCategory(dto);
+                    tempIdToCategoryMap.put(dto.getCtgId(), addCategory);
+                    resultDtos.add(convertToDto(addCategory));
+
+                    break;
+                case "u":
+                    Category updateCategory = updateCategory(dto);
+                    resultDtos.add(convertToDto(updateCategory));
+                    break;
+                case "d":
+                    Category deleteCategory = deleteCategory(dto);
+                    resultDtos.add(convertToDto(deleteCategory));
+                    break;
+                default:
+//                    throw new IllegalStateException("Unexpected value: " + dto.getStatus());
+
+            }
+        }
+
+        log.debug("{} rows saved", resultDtos.size());
+        return resultDtos;
+    }
+
+    private Category addCategory(CategoryEditDto dto) {
+        Category parent = categoryRepository.getById(Long.parseLong(dto.getCtgPrtId()));
+
+        Category category = Category.builder()
+                .ctgTitle(dto.getCtgTitle())
+                .ctgHierachy(dto.getCtgHierachy())
+                .ctgSort(dto.getCtgSort())
+                .ctgActivated(0L)
+                .parents(parent)
+                // 부모 카테고리 설정 로직이 필요할 경우 여기에 추가
+                .build();
+        // 저장 후 DTO 변환 로직 필요
+        Category savedCategory = categoryRepository.save(category);
+        return savedCategory;
+    }
+
+    private Category updateCategory(CategoryEditDto dto) {
+        Category category = categoryRepository.findById(Long.parseLong(dto.getCtgId()))
+                .orElseThrow(() -> new EntityNotFoundException("Category not found: " + dto.getCtgId()));
+
+        category.setCtgTitle(dto.getCtgTitle());
+        category.setCtgHierachy(dto.getCtgHierachy());
+        category.setCtgSort(dto.getCtgSort());
+        // 부모 카테고리 업데이트가 필요할 경우 여기에 로직 추가
+
+        Category updatedCategory = categoryRepository.save(category);
+        return updatedCategory;
+    }
+
+    private Category deleteCategory(CategoryEditDto dto) {
+        Category category = categoryRepository.findById(Long.parseLong(dto.getCtgId()))
+                .orElseThrow(() -> new EntityNotFoundException("Category not found: " + dto.getCtgId()));
+
+        category.setCtgActivated(1L);
+        Category deletedCategory = categoryRepository.save(category);
+        return deletedCategory;
+    }
+
+    private CategoryEditDto convertToDto(Category category) {
+        return CategoryEditDto.builder()
+                .ctgId(Long.toString(category.getCtgId()))
+                .ctgTitle(category.getCtgTitle())
+                .ctgHierachy(category.getCtgHierachy())
+                .ctgSort(category.getCtgSort())
+                .status("EXISTING") // 처리 후 상태를 나타내는 값으로 설정
+                .build();
     }
 
     @Transactional(readOnly = true)

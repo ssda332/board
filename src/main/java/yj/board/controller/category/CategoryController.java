@@ -46,7 +46,7 @@ public class CategoryController {
     // 카테고리 편집내용 저장
     @PutMapping("list")
     public ResponseEntity<ArrayList<CategoryEditDto>> saveCategory(@RequestBody List<CategoryEditDto> data) {
-        return ResponseEntity.ok(categoryService.saveCategory(data));
+        return ResponseEntity.ok(categoryService.saveCategory_jpa(data));
     }
 
     @Transactional

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    @Query("SELECT c FROM Category c WHERE c.parents IS NULL ORDER BY c.ctgSort")
+    @Query("SELECT c FROM Category c WHERE c.parents IS NULL AND c.ctgActivated = 0L ORDER BY c.ctgSort")
     List<Category> findTopCategories();
 
     @Query("SELECT c FROM Category c WHERE c.parents.ctgId = :parentId ORDER BY c.ctgSort")

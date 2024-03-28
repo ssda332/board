@@ -18,7 +18,7 @@ public class ParentCategory {
         if (category == null) return null;
 
         return ParentCategory.builder()
-                .ctgId(category.getCtgId())
+                .ctgId(Long.toString(category.getCtgId()))
                 .ctgTitle(category.getCtgTitle())
                 .ctgHierachy(category.getCtgHierachy())
                 .build();

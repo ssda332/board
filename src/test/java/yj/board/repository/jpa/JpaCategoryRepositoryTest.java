@@ -29,6 +29,7 @@ class JpaCategoryRepositoryTest {
 
     @Test
     void findByParentId() {
+        List<Category> categories = categoryRepository.findTopCategories();
 
     }
 }

@@ -32,7 +32,7 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="CTG_SEQ_GEN")
     @Column(name="CTG_ID")
-    private String ctgId;
+    private Long ctgId;
 
     @Column(name="CTG_TITLE")
     private String ctgTitle;
@@ -51,12 +51,16 @@ public class Category {
     @Column(name="CTG_SORT")
     private Long ctgSort;
 
+    @Column(name="CTG_ACTIVATED")
+    private Long ctgActivated;
+
     // 셀프조인
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CTG_PRT_ID")
     private Category parents;
 
     @OneToMany(mappedBy = "parents", fetch = FetchType.EAGER)
+    @OrderBy("ctgSort ASC")
     private List<Category> child = new ArrayList<>();
 
 }
