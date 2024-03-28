@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import yj.board.domain.article.dto.CategoryDto;
+import yj.board.domain.article.Category;
+import yj.board.domain.article.dto.CategoryDtoJpa;
 import yj.board.domain.article.dto.CategoryEditDto;
 import yj.board.service.CategoryService;
 
@@ -43,7 +46,14 @@ public class CategoryController {
     // 카테고리 편집내용 저장
     @PutMapping("list")
     public ResponseEntity<ArrayList<CategoryEditDto>> saveCategory(@RequestBody List<CategoryEditDto> data) {
-        return ResponseEntity.ok(categoryService.saveCategory(data));
+        return ResponseEntity.ok(categoryService.saveCategory_jpa(data));
     }
 
+    @Transactional
+    @GetMapping("jpa")
+    public ResponseEntity<List<CategoryDtoJpa>> findTopCategories() {
+        List<CategoryDtoJpa> topCategories = categoryService.findTopCategories();
+
+        return ResponseEntity.ok(topCategories);
+    }
 }

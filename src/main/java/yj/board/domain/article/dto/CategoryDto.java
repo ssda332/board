@@ -1,6 +1,7 @@
 package yj.board.domain.article.dto;
 
 import lombok.*;
+import yj.board.domain.article.Category;
 
 @Getter
 @Setter
@@ -17,7 +18,7 @@ public class CategoryDto {
     private Long ctgSort;
     private String ctgPrtId;
 
-    public static CategoryDto from(CategoryEditDto category) {
+    /*public static CategoryDto from(CategoryEditDto category) {
         if (category == null) return null;
 
         return CategoryDto.builder()
@@ -27,8 +28,6 @@ public class CategoryDto {
                 .ctgSort(category.getCtgSort())
                 .ctgPrtId(category.getCtgPrtId())
                 .build();
-    }
-
-
+    }*/
 
 }

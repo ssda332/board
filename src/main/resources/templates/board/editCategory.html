@@ -48,7 +48,7 @@
         const ulElement = document.getElementById("category_box");
         let clickedLi = null;
 
-        tokenToJson("POST", "/category/list", null, true,
+        /*tokenToJson("POST", "/category/list", null, true,
             function(data, status, xhr) {
                 renderEditCategory(data, ulElement);
             },
@@ -57,7 +57,19 @@
                 alert("권한이 없습니다.");
                 location.href = "/";
             }
+        );*/
+        tokenToJson("GET", "/category/jpa", null, true,
+            function(data, status, xhr) {
+                renderEditCategory_jpa(data, ulElement);
+            },
+
+            function(xhr, status, error) {
+                alert("권한이 없습니다.");
+                location.href = "/";
+            }
         );
+
+
 
         // 클릭한 컴포넌트 활성화
         ulElement.addEventListener("click", function (event) {

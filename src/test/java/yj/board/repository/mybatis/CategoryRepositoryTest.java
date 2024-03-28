@@ -46,7 +46,7 @@ public class CategoryRepositoryTest {
     @Test
     @DisplayName("모든 카테고리 가져오기")
     void findAll() {
-        List<CategoryDto> all = categoryMapper.findAll();
+        List<CategoryDto> all = categoryMapper.findAllCategories();
         findTest(all, "test1");
         findTest(all, "test2");
         findTest(all, "test3");

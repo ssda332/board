@@ -394,10 +394,23 @@
             );
 
             // 모든 카테고리 조회
-            ajaxJson("GET", "/category/list", {type : 1}, false,
+            /*ajaxJson("GET", "/category/list", {type : 1}, false,
                 function(data, status, xhr) {
                     var categoryList = data; // 받아온 JSON 데이터
                     let html = category_hireachy(categoryList);
+
+                    // 결과 HTML을 특정 div에 추가
+                    document.getElementById('accordionSidebar').innerHTML += html;
+                },
+
+                function(xhr, status, error) {
+                    alert("카테고리 조회 실패!");
+                }
+            );*/
+            ajaxJson("GET", "/category/jpa", null, false,
+                function(data, status, xhr) {
+                    let categoryList = data; // 받아온 JSON 데이터
+                    let html = category_hireachy_jpa(categoryList);
 
                     // 결과 HTML을 특정 div에 추가
                     document.getElementById('accordionSidebar').innerHTML += html;
